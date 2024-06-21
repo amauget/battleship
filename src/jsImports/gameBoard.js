@@ -3,7 +3,7 @@ const Ship = ShipObjs.Ship
 
 class GameBoard{
   constructor(carrier, battleship, cruiser, sub, destroyer){ /* ship obj requires length and name determined. */
-    this.board = {}
+    this.board = this.createGraph()
     this.sinkCount = 0 /* This could be used to track winner/loser. But does it belong here, or under player class? */
     this.carrier = new Ship(5, 'Carrier')
     this.battleship = new Ship(4, 'Battleship')
@@ -11,6 +11,28 @@ class GameBoard{
     this.sub = new Ship(3, 'Submarine')
     this.destroyer = new Ship(2, 'Destroyer')
 
+  }
+  createGraph(){
+    this.board = {}
+    for(let row = 0; row < 10; row++){
+      for(let col = 0; col < 10; col++){
+        let key = [col, row].toString()
+        let moves = this.validRange(col, row)
+        
+        this.board[key] = {
+          coordinates: [col, row], 
+          up: moves[0], 
+          down: moves[1], 
+          left: moves[2], 
+          right: moves[3], 
+          occupied: null, 
+          selected: false
+        }
+        /* key is string of coordinates, obj includes coordinates and surrounding positions, including null. 
+        Occupied status default value of false. Selected of true can't be selected again */
+      }
+    }
+    return this.board
   }
   validRange(col, row){
     let up = [col, row + 1]
@@ -33,26 +55,7 @@ class GameBoard{
     array.push(up,down,left,right)
     return array
   }
-  createGraph(){
-    for(let row = 0; row < 10; row++){
-      for(let col = 0; col < 10; col++){
-        let key = [col, row].toString()
-        let moves = this.validRange(col, row)
-        
-        this.board[key] = {
-          coordinates: [col, row], 
-          up: moves[0], 
-          down: moves[1], 
-          left: moves[2], 
-          right: moves[3], 
-          occupied: null, 
-          selected: false
-        }
-        /* key is string of coordinates, obj includes coordinates and surrounding positions, including null. 
-        Occupied status default value of false. Selected of true can't be selected again */
-      }
-    }
-  }
+ 
   receiveAttack(key){
     this.changeSelected(this.board[key])
     if(this.board[key].occupied !== null){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
@@ -119,5 +122,4 @@ player1.board['5,5'].occupied = 'destroyer'
 module.exports ={
   GameBoard,
   player1
-
 }
