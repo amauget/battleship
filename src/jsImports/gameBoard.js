@@ -5,11 +5,11 @@ class GameBoard{
   constructor(carrier, battleship, cruiser, sub, destroyer){ /* ship obj requires length and name determined. */
     this.board = this.createGraph()
     this.sinkCount = 0 /* This could be used to track winner/loser. But does it belong here, or under player class? */
-    this.carrier = new Ship(5, 'Carrier')
-    this.battleship = new Ship(4, 'Battleship')
-    this.cruiser = new Ship(3, 'Cruiser')
-    this.sub = new Ship(3, 'Submarine')
-    this.destroyer = new Ship(2, 'Destroyer')
+    this.carrier = new Ship(5, 'carrier')
+    this.battleship = new Ship(4, 'battleship')
+    this.cruiser = new Ship(3, 'cruiser')
+    this.sub = new Ship(3, 'submarine')
+    this.destroyer = new Ship(2, 'destroyer')
 
   }
   createGraph(){
@@ -17,7 +17,7 @@ class GameBoard{
     for(let row = 0; row < 10; row++){
       for(let col = 0; col < 10; col++){
         let key = [col, row].toString()
-        let moves = this.validRange(col, row)
+        let moves = this.surroundingCoords(col, row)
         
         this.board[key] = {
           coordinates: [col, row], 
@@ -34,7 +34,7 @@ class GameBoard{
     }
     return this.board
   }
-  validRange(col, row){
+  surroundingCoords(col, row){
     let up = [col, row + 1]
     let down = [col, row -1 ]
     let left = [col -1, row] 
@@ -55,23 +55,55 @@ class GameBoard{
     array.push(up,down,left,right)
     return array
   }
+
  
-  receiveAttack(key){
-    this.changeSelected(this.board[key])
-    if(this.board[key].occupied !== null){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
-      let ship = this.board[key].occupied
-      ship.hit()
-      return 'hit'
+ validPlacement(ship, item, orientation){ 
+  /* set duplicates should be handled in setShip()*/
+  let key = item.value
+  let currentCoord = this.board[key]
+  let array = []
+  let next = 'right'
+  if(orientation === 'y'){
+    next = 'up'
+  }
+  for(let i = 0; i < ship.length; i++){
+    console.log(i)
+    array.push(`[${currentCoord.coordinates}]`)
+    if(currentCoord[next] === null){
+      if(array.length < ship.length){
+        array.push(currentCoord[next])
+      }
+      break
     }
-    return 'miss'
+    else{
+      currentCoord = this.board[currentCoord[next]]
+    }
+  }
+  return array
+ }
+  receiveAttack(key){
+    if(this.board[key].selected === false){
+      this.changeSelected(this.board[key])
+
+      if(this.board[key].occupied !== null){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
+        let shipKey = this.board[key].occupied
+        this[shipKey].hit()
+        console.log(this[shipKey])
+        return shipKey
+      }
+      return 'miss'
+    }
+    else{
+      return false /* return value is deferring to bool for whether turn should change */
+    }
   }
   changeSelected(item){
     return item.selected = true
   }
-  setShip(ship ,coordinates, orientation = 'x'){
-    let key = coordinates.toString()
+  setShip(ship, coord, orientation = 'x'){
+    let key = coord.toString()
     const origin = this.board[key].coordinates
-
+    // let obj = this[ship]
     let coordinateArray = []
 
     if(orientation === 'x'){
@@ -80,7 +112,7 @@ class GameBoard{
       }
       else{
         /* retrieve all affected coordinates, change .occupied from null to ship */
-        for(let i = 0; i < ship.length; i++){
+        for(let i = 0; i < this[ship].length; i++){
           this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
           coordinateArray.push(this.board[key].coordinates)
           key = this.board[key].right
@@ -97,8 +129,7 @@ class GameBoard{
         for(let i = 0; i < ship.length; i++){
           this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
           coordinateArray.push(this.board[key].coordinates)
-          key = this.board[key].up
-          
+          key = this.board[key].up 
         }
         return coordinateArray
       }
@@ -107,19 +138,19 @@ class GameBoard{
 }
 
 
-let test = new GameBoard()
-test.createGraph()
-test.setShip(test.destroyer, [0,0], 'x')
+// let test = new GameBoard()
+// test.createGraph()
+// test.setShip(test.destroyer, [0,0], 'x')
 
-test.receiveAttack('0,0')
-test.receiveAttack('1,0')
+// test.receiveAttack('0,0')
+// test.receiveAttack('1,0')
 
 /* Mock Obj */
-let player1 = new GameBoard()
+/* let player1 = new GameBoard()
 player1.createGraph()
-player1.board['5,5'].occupied = 'destroyer'
+player1.board['5,5'].occupied = 'destroyer' */
 
 module.exports ={
   GameBoard,
-  player1
+/*   player1 */
 }

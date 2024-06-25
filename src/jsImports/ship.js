@@ -24,7 +24,6 @@ sunkShip.hits = 5
 
 let notSunkShip = new Ship(3).hit()
 
-
 module.exports = {
   Ship,
   sunkShip,

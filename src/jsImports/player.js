@@ -12,3 +12,5 @@ let player = new Player()
 let computer = new Player('Computer')
 let key = '4,1'
 /* computer.GameBoard.board[key] access format */
+
+module.exports = Player
