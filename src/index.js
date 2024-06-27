@@ -37,18 +37,20 @@ function events(game){ /* all current data is stored outside the queue */
   })
 
   let playerDOM = document.querySelector('.playerBoard')
+  
 
   playerDOM.addEventListener('mouseover', (event) =>{ /* red/green backgrounds to indicate elligibility */
-    if(game.count < 5){
-      let target = event.target
+      if(shipList.childElementCount > 0){
+        let target = event.target
     
-      switch(target.className){
-        case('cell'):
-          game.updateValidArray(target) /* array items are strings...? */
-       
-          game.cellAuditColoration()
+        switch(target.className){
+          case('cell'):
+            game.updateValidArray(target) /* array items are strings...? */
+         
+            game.cellAuditColoration()
+        }
       }
-    }
+      
   })
 
   playerDOM.addEventListener('click', (event) =>{ /* Is working and preventing placement for x axis only */
