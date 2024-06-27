@@ -8,6 +8,8 @@ class DOM{ /* Class links DOM to GameBoards */
     this.currentPlayer = this.player1
 
     this.playerDOM = document.querySelector('.playerBoard')
+    this.sideBarList = document.querySelector('ul')
+    this.sideBarShips = document.querySelectorAll('.ship')
 
     this.ship = (this.player1).carrier
     this.orient = 'x'
@@ -45,7 +47,6 @@ class DOM{ /* Class links DOM to GameBoards */
     if(this.validArray[this.validArray.length - 1] !== null){
       return true
     }
- 
   }
   auditCellOccupied(){ /* checks cell objs for empty status */
    for(let i = 0; i < this.validArray.length; i++){
@@ -55,12 +56,10 @@ class DOM{ /* Class links DOM to GameBoards */
     if(coord.occupied !== false){
       return false
     }
-
    }
    return true
   }
   cellAuditColoration(){
-
     let cells = document.querySelectorAll('.cell')
     
     cells.forEach(cell =>{
@@ -93,13 +92,26 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   trimSideBar(){
     let placedShip = document.querySelector(`#${this.ship.name}`)
-    placedShip.style.display = 'none'
-
+    console.log(this.ship.name)
+    this.sideBarList.removeChild(placedShip)
     this.count += 1
-    
-    let remainingShips = document.querySelectorAll('.ship')
-    this.ship = remainingShips[this.count]
 
+    return this.sideBarShips = this.updateSideBarShips(placedShip) /* nodeList to iterate for ship placement status */
+  }
+  updateSideBarShips(placedShip, status = 'trim'){ /* status condition determines whether reset or ship placement is occurring */
+    let newSideBarShips = []
+    if(status === 'reset'){
+      newSideBarShips = document.querySelectorAll('.ship')
+    }
+    else{
+      this.sideBarShips.forEach(ship => {
+        if(ship.textContent !== placedShip.textContent){
+          newSideBarShips.push(ship)
+        }
+      })
+    }
+
+    return newSideBarShips /* updates this.sideBarShips */
   }
   allShipsPlaced(){
     let sideBarShips = document.querySelectorAll('.ship')
@@ -110,11 +122,24 @@ class DOM{ /* Class links DOM to GameBoards */
     })
     return true
   }
-  resetDOM(){
-    let cells = document.querySelectorAll('cell')
-    cells.forEach(cell =>{
-      cell.style.background = 'white'
-    })
+  resetSideBar(){
+    this.sideBarList.innerHTML = ''
+    let shipNames = ['Carrier', 'Battleship', 'Submarine', 'Cruiser', 'Destroyer']
+    for(let i = 0; i < 5; i++){
+      let item = document.createElement('li')
+      item.textContent = shipNames[i]
+      item.id = (shipNames[i]).toLocaleLowerCase()
+      item.className = 'ship'
+
+      this.sideBarList.append(item)
+    }
+    this.sideBarShips =  this.updateSideBarShips(undefined, 'reset') 
+
+    return this.sideBarList
+  }
+  defaultShipSelector(){
+    let shipName = this.sideBarShips[0].id
+    this.selectShip(shipName)
   }
 }
 
