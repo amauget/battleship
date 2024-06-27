@@ -2,13 +2,14 @@ const ShipObjs = require('./ship')
 const Ship = ShipObjs.Ship
 
 class GameBoard{
-  constructor(carrier, battleship, cruiser, sub, destroyer){ /* ship obj requires length and name determined. */
+  constructor(playerType){ /* ship obj requires length and name determined. */
     this.board = this.createGraph()
+    this.playerType = playerType
     this.sinkCount = 0 /* This could be used to track winner/loser. But does it belong here, or under player class? */
     this.carrier = new Ship(5, 'carrier')
     this.battleship = new Ship(4, 'battleship')
     this.cruiser = new Ship(3, 'cruiser')
-    this.sub = new Ship(3, 'submarine')
+    this.sub = new Ship(3, 'sub')
     this.destroyer = new Ship(2, 'destroyer')
 
   }
@@ -25,8 +26,9 @@ class GameBoard{
           down: moves[1], 
           left: moves[2], 
           right: moves[3], 
-          occupied: null, 
-          selected: false
+          occupied: false, 
+          selected: false,
+          background: 'white' /* default cell color, changes only after ship placement */
         }
         /* key is string of coordinates, obj includes coordinates and surrounding positions, including null. 
         Occupied status default value of false. Selected of true can't be selected again */
@@ -48,7 +50,7 @@ class GameBoard{
     if(col > 8){
       right = null
     }
-    else if(col < 1){ /* bug in left right determination */
+    else if(col < 1){
       left = null
     }
     let array = []
@@ -67,8 +69,7 @@ class GameBoard{
     next = 'up'
   }
   for(let i = 0; i < ship.length; i++){
-    console.log(i)
-    array.push(`[${currentCoord.coordinates}]`)
+    array.push(`${currentCoord.coordinates}`) /* why are these converted to string? */
     if(currentCoord[next] === null){
       if(array.length < ship.length){
         array.push(currentCoord[next])
@@ -100,40 +101,25 @@ class GameBoard{
   changeSelected(item){
     return item.selected = true
   }
-  setShip(ship, coord, orientation = 'x'){
-    let key = coord.toString()
-    const origin = this.board[key].coordinates
-    // let obj = this[ship]
-    let coordinateArray = []
-
+  setShip(ship, validArray, orientation = 'x'){
+    let next = undefined
     if(orientation === 'x'){
-      if((origin[0] + ship.length - 1) > 9){
-        return null
-      }
-      else{
-        /* retrieve all affected coordinates, change .occupied from null to ship */
-        for(let i = 0; i < this[ship].length; i++){
-          this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
-          coordinateArray.push(this.board[key].coordinates)
-          key = this.board[key].right
-        }
-        return coordinateArray
-      }
+      next = 'right'
     }
-    else{
-      if((origin[1] + ship.length - 1) > 9){
-        return null
-      }
-      else{
-        /* retrieve all affected coordinates, change .occupied from null to ship */
-        for(let i = 0; i < ship.length; i++){
-          this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
-          coordinateArray.push(this.board[key].coordinates)
-          key = this.board[key].up 
-        }
-        return coordinateArray
-      }
+    else{ /* orientation = y */
+      next = 'up'
     }
+    let arraySeg = validArray[0]
+
+    let key = this.board[arraySeg].coordinates
+    for(let i = 0; i < ship.length; i++){
+      this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
+      key = this.board[key][next]
+
+      arraySeg = validArray[i]
+      key = this.board[arraySeg][next]
+    }
+    return this.board
   }
 }
 
@@ -145,12 +131,9 @@ class GameBoard{
 // test.receiveAttack('0,0')
 // test.receiveAttack('1,0')
 
-/* Mock Obj */
-/* let player1 = new GameBoard()
-player1.createGraph()
-player1.board['5,5'].occupied = 'destroyer' */
+
 
 module.exports ={
   GameBoard,
-/*   player1 */
+
 }
