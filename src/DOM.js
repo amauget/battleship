@@ -59,12 +59,16 @@ class DOM{ /* Class links DOM to GameBoards */
    }
    return true
   }
+
   cellAuditColoration(){
     let cells = document.querySelectorAll('.cell')
     
     cells.forEach(cell =>{
       cell.style.background = (this.player1).board[cell.value].background /* intended to reset to either white(empty) or gray(ship placed)*/ 
-      if((this.validArray).includes(cell.textContent)){
+      if(this.validArray === null){
+        return
+      }
+      else if((this.validArray).includes(cell.textContent)){
 
         if(this.auditRange() === true && this.auditCellOccupied() === true){
           cell.style.background = 'green'
@@ -74,6 +78,9 @@ class DOM{ /* Class links DOM to GameBoards */
         }
       }
     })
+  }
+  cellColorDefault(){
+    
   }
   setShipColoration(){
     let cells = document.querySelectorAll('.cell')

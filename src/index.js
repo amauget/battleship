@@ -41,14 +41,22 @@ function events(game){ /* all current data is stored outside the queue */
   let handleMouseover = (event) =>{ /* red/green backgrounds to indicate elligibility */
     if(shipList.childElementCount > 0){
       let target = event.target
-  
-      switch(target.className){
-        case('cell'):
-          game.updateValidArray(target) /* array items are strings...? */
-       
-          game.cellAuditColoration()
+      if(target.className !== 'cell'){
+        game.validArray = null
+        game.cellAuditColoration()
       }
-    }
+      else{
+        switch(target.className){
+          case('cell'):
+         
+            game.updateValidArray(target) /* array items are strings...? */
+         
+            game.cellAuditColoration()
+  
+          }
+        }
+      }
+      
   }
   playerDOM.addEventListener('mouseover', handleMouseover)
 
@@ -93,7 +101,7 @@ function events(game){ /* all current data is stored outside the queue */
       playerDOM.removeEventListener('mouseover', handleMouseover)
       
       resetPieces.removeEventListener('click', handleReset)
-      
+
       gameBegins(playerDOM, game)
     }
 
