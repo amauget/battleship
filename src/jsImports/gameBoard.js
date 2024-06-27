@@ -9,7 +9,7 @@ class GameBoard{
     this.carrier = new Ship(5, 'carrier')
     this.battleship = new Ship(4, 'battleship')
     this.cruiser = new Ship(3, 'cruiser')
-    this.sub = new Ship(3, 'sub')
+    this.submarine = new Ship(3, 'submarine')
     this.destroyer = new Ship(2, 'destroyer')
 
   }

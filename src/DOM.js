@@ -92,13 +92,13 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   trimSideBar(){
     let placedShip = document.querySelector(`#${this.ship.name}`)
-    console.log(this.ship.name)
     this.sideBarList.removeChild(placedShip)
     this.count += 1
 
     return this.sideBarShips = this.updateSideBarShips(placedShip) /* nodeList to iterate for ship placement status */
   }
-  updateSideBarShips(placedShip, status = 'trim'){ /* status condition determines whether reset or ship placement is occurring */
+  updateSideBarShips(placedShip, status = 'trim'){ 
+    /* status condition determines whether reset or ship placement is occurring */
     let newSideBarShips = []
     if(status === 'reset'){
       newSideBarShips = document.querySelectorAll('.ship')
@@ -138,8 +138,11 @@ class DOM{ /* Class links DOM to GameBoards */
     return this.sideBarList
   }
   defaultShipSelector(){
-    let shipName = this.sideBarShips[0].id
-    this.selectShip(shipName)
+    if(this.sideBarList.childElementCount > 0){
+      let shipName = this.sideBarShips[0].id
+      this.selectShip(shipName)
+    }
+    
   }
 }
 

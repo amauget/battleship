@@ -38,22 +38,21 @@ function events(game){ /* all current data is stored outside the queue */
 
   let playerDOM = document.querySelector('.playerBoard')
   
-
-  playerDOM.addEventListener('mouseover', (event) =>{ /* red/green backgrounds to indicate elligibility */
-      if(shipList.childElementCount > 0){
-        let target = event.target
-    
-        switch(target.className){
-          case('cell'):
-            game.updateValidArray(target) /* array items are strings...? */
-         
-            game.cellAuditColoration()
-        }
+  let handleMouseover = (event) =>{ /* red/green backgrounds to indicate elligibility */
+    if(shipList.childElementCount > 0){
+      let target = event.target
+  
+      switch(target.className){
+        case('cell'):
+          game.updateValidArray(target) /* array items are strings...? */
+       
+          game.cellAuditColoration()
       }
-      
-  })
+    }
+  }
+  playerDOM.addEventListener('mouseover', handleMouseover)
 
-  playerDOM.addEventListener('click', (event) =>{ /* Is working and preventing placement for x axis only */
+  let handleClick = (event) =>{ 
     let target = event.target
     switch(target.className){
       case('cell'):
@@ -66,11 +65,11 @@ function events(game){ /* all current data is stored outside the queue */
           game.defaultShipSelector()
         }
     }
-  })
+  }
+  playerDOM.addEventListener('click', handleClick)
+  
 
-  let resetPieces = document.querySelector('.resetPieces')
-
-  resetPieces.addEventListener('click', () =>{ /* note. grid doesn't reset until hover occurs */      
+  let handleReset = () =>{ /* note. grid doesn't reset until hover occurs */      
     playerDOM.innerHTML = '' /* deletes DOM game board */
     game.createBoard() /* creates new DOM game board */
 
@@ -80,11 +79,29 @@ function events(game){ /* all current data is stored outside the queue */
     
     game.defaultShipSelector()
     console.log(game.ship)
+  }
+  let resetPieces = document.querySelector('.resetPieces')
+
+  resetPieces.addEventListener('click', handleReset)
+
+
+  let startGame = document.querySelector('.startGame')
+
+  startGame.addEventListener('click', () =>{
+    if(shipList.childElementCount === 0){
+      playerDOM.removeEventListener('click', handleClick)
+      playerDOM.removeEventListener('mouseover', handleMouseover)
+      
+      resetPieces.removeEventListener('click', handleReset)
+      
+      gameBegins(playerDOM, game)
+    }
+
   })
 }
 
-function startGame(){
-  alert('test')
+function gameBegins(playerDOM, game){
+  console.log('test')
 }
 
 
