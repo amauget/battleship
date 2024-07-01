@@ -28,7 +28,7 @@ class GameBoard{
           right: moves[3], 
           occupied: false, 
           selected: false,
-          background: 'white' /* default cell color, changes only after ship placement */
+          background: 'none' /* default cell color, changes only after ship placement */
         }
         /* key is string of coordinates, obj includes coordinates and surrounding positions, including null. 
         Occupied status default value of false. Selected of true can't be selected again */

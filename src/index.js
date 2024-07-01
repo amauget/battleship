@@ -9,18 +9,21 @@ Emphasis on loosely coupled function relationships
 function init(){ 
   let game = new DOM()
   game.createBoard()
+
+
   events(game)
 
 }
 function events(game){ /* all current data is stored outside the queue */
-  let shipList = document.querySelector('ul')
+  let shipList = document.querySelector('.ships')
   shipList.addEventListener('click', (event) =>{
     let target = event.target
-    switch(target.className){
-      case('ship'):
+   
         game.selectShip(target.id)
+        game.selectedShipIndicator(target, shipList)
+            
         /* cell id is labeled to be the same as ship obj key */
-    }
+    
   })
 
   let orient_y = document.querySelector('#y')
@@ -36,7 +39,7 @@ function events(game){ /* all current data is stored outside the queue */
     game.updateOrient('x')
   })
 
-  let playerDOM = document.querySelector('.playerBoard')
+  let playerDOM = document.querySelector('.playerBoardContainer')
   
   let handleMouseover = (event) =>{ /* red/green backgrounds to indicate elligibility */
     if(shipList.childElementCount > 0){
@@ -68,8 +71,13 @@ function events(game){ /* all current data is stored outside the queue */
           
           (game.currentPlayer).setShip(game.ship, game.validArray, game.orient)
 
+          game.trimSideBar() 
+
           game.setShipColoration() /* changes default grid color to gray */
-          game.trimSideBar() /* hides previously set ships from side bar */
+          
+          game.setShipImg(target)
+
+          /* hides previously set ships from side bar */
           game.defaultShipSelector()
         }
     }
@@ -78,7 +86,6 @@ function events(game){ /* all current data is stored outside the queue */
   
 
   let handleReset = () =>{ /* note. grid doesn't reset until hover occurs */      
-    playerDOM.innerHTML = '' /* deletes DOM game board */
     game.createBoard() /* creates new DOM game board */
 
     game.player1.createGraph() /* resets cell obj data*/
@@ -86,7 +93,7 @@ function events(game){ /* all current data is stored outside the queue */
     game.resetSideBar()
     
     game.defaultShipSelector()
-    console.log(game.ship)
+  
   }
   let resetPieces = document.querySelector('.resetPieces')
 
@@ -109,7 +116,8 @@ function events(game){ /* all current data is stored outside the queue */
 }
 
 function gameBegins(playerDOM, game){
-  console.log('test')
+  let opponentBoard = document.querySelector('.opponentBoard')
+  game.createBoard(opponentBoard)
 }
 
 

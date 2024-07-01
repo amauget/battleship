@@ -12,11 +12,13 @@ class DOM{ /* Class links DOM to GameBoards */
     this.sideBarShips = document.querySelectorAll('.ship')
 
     this.ship = (this.player1).carrier
+   
     this.orient = 'x'
     this.validArray = []
     this.count = 0 /* used to navigate to next ship in sideBar */
   }
-  createBoard(){
+  createBoard(div = this.playerDOM, playerBoardContainer = document.querySelector('.playerBoardContainer')){
+    div.innerHTML = ''
     let classArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
     for(let row = 0; row < 10; row++){
       let rowElement = document.createElement('div')
@@ -28,10 +30,12 @@ class DOM{ /* Class links DOM to GameBoards */
         colElement.value = `${col},${row}`
         colElement.className = 'cell' 
         rowElement.appendChild(colElement)
-        colElement.textContent = `${colElement.value}`      
+        // colElement.textContent = `${colElement.value}`   
+         
       }
-      (this.playerDOM).appendChild(rowElement)
+      div.appendChild(rowElement)
     }
+    playerBoardContainer.appendChild(div)
   }
   selectShip(shipName){
     return this.ship = this.currentPlayer[shipName] /* targets current "gameboard" */
@@ -66,21 +70,42 @@ class DOM{ /* Class links DOM to GameBoards */
     cells.forEach(cell =>{
       cell.style.background = (this.player1).board[cell.value].background /* intended to reset to either white(empty) or gray(ship placed)*/ 
       if(this.validArray === null){
+
         return
       }
-      else if((this.validArray).includes(cell.textContent)){
+      else if((this.validArray).includes(cell.value)){
 
         if(this.auditRange() === true && this.auditCellOccupied() === true){
-          cell.style.background = 'green'
+          cell.style.background = 'rgba(0, 128, 0, 0.479)'
         }
         else{
-          cell.style.background = 'red'
+          cell.style.background = 'rgba(255, 0, 0, 0.384)'
         }
       }
     })
   }
-  cellColorDefault(){
-    
+  setShipImg(cell){
+    cell.style.background = 'none'
+    let ship = this.ship
+    let img = document.createElement('img')
+
+    img.src = `./externalItems/shipSprites/${ship.name}.png`
+    img.id = ship.name
+    img.style.transformOrigin = 'top'
+    img.style.background = 'none'
+    if(this.orient === 'x'){
+        cell.style.transform = 'rotate(270deg)' 
+        /* rotating the cell keeps the image origin in the same spot.  */
+        
+        
+    }
+    else{
+
+      cell.style.transform = 'rotate(180deg)'
+    }
+    cell.appendChild(img)
+    cell.style.textAlign = 'center'
+   
   }
   setShipColoration(){
     let cells = document.querySelectorAll('.cell')
@@ -90,9 +115,9 @@ class DOM{ /* Class links DOM to GameBoards */
      
       if((this.validArray).includes(cell.value)){
 
-        (this.currentPlayer).board[cell.value].background = 'gray'
+        (this.currentPlayer).board[cell.value].background = 'rgba(128, 128, 128, 0)'
         this.currentPlayer.board[cell.value]
-        cell.style.background = 'gray'
+        cell.style.background = 'rgba(128, 128, 128, 0)'
       }
     })
     return this.currentPlayer
@@ -112,7 +137,7 @@ class DOM{ /* Class links DOM to GameBoards */
     }
     else{
       this.sideBarShips.forEach(ship => {
-        if(ship.textContent !== placedShip.textContent){
+        if(ship.id !== placedShip.id){
           newSideBarShips.push(ship)
         }
       })
@@ -131,10 +156,10 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   resetSideBar(){
     this.sideBarList.innerHTML = ''
-    let shipNames = ['Carrier', 'Battleship', 'Submarine', 'Cruiser', 'Destroyer']
+    let shipNames = ['carrier', 'battleship', 'submarine', 'cruiser', 'destroyer']
     for(let i = 0; i < 5; i++){
-      let item = document.createElement('li')
-      item.textContent = shipNames[i]
+      let item = document.createElement('img')
+      item.src = `./externalItems/shipSprites/${shipNames[i]}.png`
       item.id = (shipNames[i]).toLocaleLowerCase()
       item.className = 'ship'
 
@@ -148,9 +173,19 @@ class DOM{ /* Class links DOM to GameBoards */
     if(this.sideBarList.childElementCount > 0){
       let shipName = this.sideBarShips[0].id
       this.selectShip(shipName)
+
+      this.selectedShipIndicator(document.querySelector(`#${shipName}`))
     }
-    
+
   }
+  selectedShipIndicator(ship){
+    let ships = document.querySelectorAll('.ship')
+    ships.forEach(item =>{
+      item.style.background = 'none'
+    })
+ 
+    ship.style.background = 'rgba(16, 0, 241, 0.459)'
+  } 
 }
 
 module.exports = DOM
