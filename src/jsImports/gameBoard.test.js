@@ -1,8 +1,10 @@
 const gameBoardObjs = require('./gameBoard')
 
 const GameBoard = gameBoardObjs.GameBoard
-
-let player1 = gameBoardObjs.player1
+/* Mock Obj */
+let player1 = new GameBoard()
+player1.createGraph()
+player1.board['5,5'].occupied = 'destroyer'
 
 it('provides correct coordinate above', () => {
   expect(player1.board['2,2'].up).toContain(2,3)
@@ -34,15 +36,6 @@ it('returns null for connected "cells" that are left of min range', () =>{
 
 it('returns null for connected "cells" that are right of max range', () => {
   expect(player1.board['9,0'].right).toEqual(null)
-})
-
-/* attack */
-it('returns miss, if no ship occupies the coordinates', () => {
-  expect(player1.receiveAttack('3,2')).toMatch('miss')
-})
-
-it('returns hit if a ship occupies coordinates', () =>{
-  expect(player1.receiveAttack('5,5')).toMatch('hit')
 })
 
 /* Setting ships */

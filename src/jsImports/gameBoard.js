@@ -12,6 +12,8 @@ class GameBoard{
     this.submarine = new Ship(3, 'submarine')
     this.destroyer = new Ship(2, 'destroyer')
 
+    this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer] /* utilized for setting opponent ships */
+
   }
   createGraph(){
     this.board = {}
@@ -61,8 +63,12 @@ class GameBoard{
  
  validPlacement(ship, item, orientation){ 
   /* set duplicates should be handled in setShip()*/
-  let key = item.value
+  let key = item
+  if(typeof(item) === 'object'){ /* DOM Item vs String Coordinates */
+    key = item.value
+  }
   let currentCoord = this.board[key]
+
   let array = []
   let next = 'right'
   if(orientation === 'y'){
@@ -120,6 +126,19 @@ class GameBoard{
       key = this.board[arraySeg][next]
     }
     return this.board
+  }
+  trimShipsArray(ship){
+  this.shipsArray.forEach(item =>{ 
+    if(item.name === ship.name){ 
+      let index = this.shipsArray.indexOf(item)
+      this.shipsArray.splice(index, 1)
+    }
+  })
+    return this.shipsArray
+  }
+  
+  resetShipsArray(){
+    return this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer]
   }
 }
 
