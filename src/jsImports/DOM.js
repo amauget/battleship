@@ -5,7 +5,7 @@ class DOM{ /* Class links DOM to GameBoards */
     this.player1 = new GameBoard('human')
     this.player2 = new GameBoard('computer')
 
-    this.currentPlayer = this.player1
+    this.currentPlayer = this.player2
 
     this.sideBarList = document.querySelector('ul')
     this.sideBarShips = document.querySelectorAll('.ship')
@@ -15,23 +15,35 @@ class DOM{ /* Class links DOM to GameBoards */
     this.orient = 'x'
     this.validArray = []
     this.count = 0 /* used to navigate to next ship in sideBar */
+    this.shipCoorTrack = [] /* provides the  */
   }
-  allShipsPlaced(){
-    let shipList = document.querySelector('.ships')
-    return shipList.childElementCount === 0 ? true : false
+
+  /*     PRE-GAME FUNCTIONS    */
+  
+  allShipsPlaced(){ /* REMEMBER TO CHANGE CURRENT PLAYER */
+    let shipList = this.currentPlayer.shipsArray
+    return shipList.length === 0 ? true : false
   }
   auditRange(){ /* checks this.validArray for null value  */
     if(this.validArray[this.validArray.length - 1] !== null){
       return true
     }
   }
-  auditCellOccupied(){ /* checks cell objs for empty status */
-   for(let i = 0; i < this.validArray.length; i++){
-    let key = (this.validArray[i])
-    let coord = this.player1.board[key]
-
-    if(coord.occupied !== false){
-      return false
+  auditCellOccupied(array = this.validArray){ /* checks cell objs for empty status */
+  console.log(array)
+  for(let i = 0; i < array.length; i++){
+    let key = (array[i])
+    try{
+      let coord = this.currentPlayer.board[key]
+      console.log(coord.occupied, i)
+      if(coord.occupied !== false){
+        console.log('SHIP FOUND!')
+        return false
+      }
+    }catch(e){ /* coordinates that = 10 or -1. Since they don't exist, they can't be occupied. */
+      if(e instanceof TypeError){
+        continue
+      }
     }
    }
    return true
@@ -47,7 +59,6 @@ class DOM{ /* Class links DOM to GameBoards */
           cell.style.background = 'none'
           return
         }
-        
           if((this.validArray).includes(cell.value)){ /* narrows target to to pertinent cells */
   
           if(this.auditRange() === true && this.auditCellOccupied() === true){
@@ -93,7 +104,6 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   defaultShipSelector(){ /* utilizes ship array found under Gameboard */
     let shipsArray = this.currentPlayer.shipsArray
-    // console.log(shipsArray)
     if(shipsArray.length > 0){
       let shipName = shipsArray[0].name
       
@@ -102,48 +112,6 @@ class DOM{ /* Class links DOM to GameBoards */
       this.selectedShipIndicator(document.querySelector(`#${shipName}`))
     }
     
-  }
-  randomShipSet(player = this.player2){  /*  updateValidArray(cell)*/
-    let shipsArray = player.shipsArray
-   
-    while(player.shipsArray.length > 0){
-      this.orient = this.randomizeOrientation()
-
-      let startingCoor =  this.randomizeCoordinates()
-     
-      this.updateValidArray(startingCoor)
-     
-      while(this.auditRange() !== true){
-        startingCoor = this.randomizeCoordinates()
-        this.updateValidArray(startingCoor) 
-      }
-      player.setShip(this.ship, this.validArray, this.orient )
-
-      this.setShipColoration()
-   
-      player.trimShipsArray()
-      
-      this.defaultShipSelector()
-    }
-    
-  }
-  randomizeCoordinates(){
-    let array = []
-    
-    for(let i = 0; i < 2; i ++){
-      let randomizer = Math.floor(Math.random() * 10)
-      array.push(randomizer)
-    }
-    let x = array[0], y = array[1]
-
-    return `${x},${y}` /* this is starting point of ship placement */
-
-  }
-  randomizeOrientation(){
-    let orientations = ['x', 'y']
-    
-    let randomizer = Math.floor(Math.random() * 2)
-    return this.orient = orientations[randomizer] /* this is the orientation of ship placement */
   }
   resetSideBar(){
     this.sideBarList.innerHTML = ''
@@ -167,7 +135,6 @@ class DOM{ /* Class links DOM to GameBoards */
     cells.forEach(cell =>{
       /* target only relevent cells, if empty and within range, allow ship placement */
       if((this.validArray).includes(cell.value)){
-
         (this.currentPlayer).board[cell.value].background = 'blue'
         this.currentPlayer.board[cell.value]
         cell.style.background = 'blue'
@@ -245,8 +212,99 @@ class DOM{ /* Class links DOM to GameBoards */
       })
     }
     return newSideBarShips /* updates this.sideBarShips */
-  }  
- 
+  }
+
+  /*    OPPONENT SHIP PLACEMENT   */
+
+  auditComputerPlacement(){
+    let orientIndex = { 
+      x: 0,
+      y: 1
+    }
+    let index = orientIndex[this.orient] //targets coordinate index based on ship orientation
+  
+    let inverseIndex = undefined
+    index === 0 ? inverseIndex = 1 : inverseIndex = 0
+  
+    /* Points along ship axis */
+    let beforeFirst = this.prepAdjacentCoords(0, index, -1) /* first and last inputs are intrinsicly static values */
+  
+    let afterLast = this.prepAdjacentCoords((this.validArray.length - 1), index, 1)
+    
+    let neighbors = [beforeFirst, afterLast]
+    
+    /* Points parallel to ship axis */
+    for(let i = 0; i < this.validArray.length; i++){
+      let under = this.prepAdjacentCoords(i, inverseIndex, -1)
+      let over = this.prepAdjacentCoords(i, inverseIndex, 1)
+  
+      neighbors.push(under, over) 
+    }
+    if(this.auditCellOccupied(neighbors) === true){
+      return true
+    }
+    
+  }
+  prepAdjacentCoords(arrayIndex, index, value){
+    let start = this.validArray[arrayIndex].replace(',','') /* initial coordinates. comma removed for consisitent index targeting */
+  
+    //isolate coord to change
+    let isolate = start[index]
+  
+    //Convert isolated coord to target value & convert back to string
+    let changed = (parseInt(isolate) + value).toString()
+  
+    //isolate static coord
+    let staticIndex = undefined
+    index === 0 ? staticIndex = 1 : staticIndex = 0
+  
+    let unchanged = start[staticIndex]
+  
+    return  index < staticIndex ? `${changed},${unchanged}` : `${unchanged},${changed}` 
+    /* dictates order of changed/unchanged variables based on index selected by this.orient */
+  }
+  randomizeCoordinates(){
+    let array = []
+    
+    for(let i = 0; i < 2; i ++){
+      let randomizer = Math.floor(Math.random() * 10)
+      array.push(randomizer)
+    }
+    let x = array[0], y = array[1]
+
+    return `${x},${y}` /* this is starting point of ship placement */
+
+  }
+  randomizeOrientation(){
+    let orientations = ['x', 'y']
+    
+    let randomizer = Math.floor(Math.random() * 2)
+    return this.orient = orientations[randomizer] /* this is the orientation of ship placement */
+  }
+
+  randomShipSet(player = this.player2){  /*  updateValidArray(cell)*/   
+    // console.log(this.currentPlayer.shipsArray)
+    if(this.allShipsPlaced() === true){
+      return
+    }
+    this.orient = this.randomizeOrientation()
+
+    let startingCoor =  this.randomizeCoordinates()
+    this.updateValidArray(startingCoor)
+
+    if(this.auditRange() === true && this.auditCellOccupied() !== false){
+      if(this.auditComputerPlacement()){
+        this.currentPlayer.setShip(this.ship, this.validArray, this.orient)
+        this.setShipColoration()
+        this.currentPlayer.trimShipsArray(this.ship)
+        this.defaultShipSelector()
+      }
+    }
+      this.randomShipSet() 
+  }
+  /*    GAME FUNCTIONS     */ 
+
+
 }
 
 module.exports = DOM

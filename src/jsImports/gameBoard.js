@@ -75,7 +75,7 @@ class GameBoard{
     next = 'up'
   }
   for(let i = 0; i < ship.length; i++){
-    array.push(`${currentCoord.coordinates}`) /* why are these converted to string? */
+    array.push(`${currentCoord.coordinates}`) /* push first because selected coor is valid by nature */
     if(currentCoord[next] === null){
       if(array.length < ship.length){
         array.push(currentCoord[next])
@@ -128,13 +128,9 @@ class GameBoard{
     return this.board
   }
   trimShipsArray(ship){
-  this.shipsArray.forEach(item =>{ 
-    if(item.name === ship.name){ 
-      let index = this.shipsArray.indexOf(item)
-      this.shipsArray.splice(index, 1)
-    }
-  })
-    return this.shipsArray
+    let index = this.shipsArray.indexOf(ship)
+    
+    return this.shipsArray.splice(index, 1)
   }
   
   resetShipsArray(){
