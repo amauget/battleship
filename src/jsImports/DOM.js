@@ -1,16 +1,19 @@
 const { GameBoard } = require("./gameBoard")
+const Alert = require('./alert')
 
 class DOM{ /* Class links DOM to GameBoards */
   constructor(){
-    this.player1 = new GameBoard('human')
-    this.player2 = new GameBoard('computer')
+    this.player1 = new GameBoard('playerCell')
+    this.player2 = new GameBoard('opponentCell')
 
-    this.currentPlayer = this.player2
+    this.alert = new Alert()
+
+    this.currentPlayer = this.player1
 
     this.sideBarList = document.querySelector('ul')
     this.sideBarShips = document.querySelectorAll('.ship')
 
-    this.ship = (this.player1).carrier
+    this.ship = (this.currentPlayer).carrier
    
     this.orient = 'x'
     this.validArray = []
@@ -30,14 +33,11 @@ class DOM{ /* Class links DOM to GameBoards */
     }
   }
   auditCellOccupied(array = this.validArray){ /* checks cell objs for empty status */
-  console.log(array)
   for(let i = 0; i < array.length; i++){
     let key = (array[i])
     try{
       let coord = this.currentPlayer.board[key]
-      console.log(coord.occupied, i)
       if(coord.occupied !== false){
-        console.log('SHIP FOUND!')
         return false
       }
     }catch(e){ /* coordinates that = 10 or -1. Since they don't exist, they can't be occupied. */
@@ -54,7 +54,7 @@ class DOM{ /* Class links DOM to GameBoards */
     
     cells.forEach(cell =>{
 
-      cell.style.background = (this.player1).board[cell.value].background /* intended to reset to either white(empty) or gray(ship placed)*/ 
+      cell.style.background = (this.currentPlayer).board[cell.value].background /* intended to reset to either white(empty) or gray(ship placed)*/ 
         if((this.validArray).length === 0){
           cell.style.background = 'none'
           return
@@ -282,8 +282,8 @@ class DOM{ /* Class links DOM to GameBoards */
     return this.orient = orientations[randomizer] /* this is the orientation of ship placement */
   }
 
-  randomShipSet(player = this.player2){  /*  updateValidArray(cell)*/   
-    // console.log(this.currentPlayer.shipsArray)
+  randomShipSet(){  /*  updateValidArray(cell)*/   
+
     if(this.allShipsPlaced() === true){
       return
     }
@@ -304,7 +304,25 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   /*    GAME FUNCTIONS     */ 
 
+  attackHandling(target){ /* fed from event listeners in index -> gameBegins() */
+    let attackStatus = this.currentPlayer.receiveAttack(target.value)
+    let marker = document.createElement('p')
+    marker.className = 'marker'
+    marker.textContent = 'x'
+    if(attackStatus === 'miss'){
+      marker.style.color = 'white'
 
+    }
+    else if(attackStatus === 'hit'){
+      marker.style.color = 'red'
+      
+      let ship = this.currentPlayer.board[target.value].occupied
+  
+      this.alert.hitMessage(ship.name)
+    }
+    // Implement a call to change this.changeCurrentPlayer()
+    return marker
+  }
 }
 
 module.exports = DOM

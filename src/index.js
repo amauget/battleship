@@ -1,4 +1,3 @@
-const Alert = require('./jsImports/alert')
 const DOM = require('./jsImports/DOM')
 
 import './style.css'
@@ -10,28 +9,25 @@ Emphasis on loosely coupled function relationships
 function init(){ 
   let game = new DOM()
 
-   let opponentBoard = document.querySelector('.opponentBoardContainer')
+  let opponentBoard = document.querySelector('.opponentBoardContainer')
   game.createBoard(opponentBoard, 'opponentBoard', 'opponentCell')
-  /* opponent stuff moved for development */
 
   let playerBoardContainer = document.querySelector('.playerBoardContainer')
   game.createBoard(playerBoardContainer, 'playerBoard', 'playerCell')
 
-  let alert = new Alert()
-  alert.welcome()
+  // game.alert.welcome()
 
 /* remove after dev  */
-  // game.changeCurrentPlayer()
-/*   game.randomShipSet()
- *//*^^^ remove after dev ^^^  */
 
-  let okayBtn = document.querySelector('.okay')
-  okayBtn.addEventListener('click', () =>{
-    alert.hide()
-    setUp(game)
-  })
+ /*^^^ remove after dev ^^^  */
+
+  // let okayBtn = document.querySelector('.okay')
+  // okayBtn.addEventListener('click', () =>{
+  //   game.alert.hide()
+    setUp(game, playerBoardContainer, opponentBoard)
+  // })
 }
-function setUp(game){ /* all current data is stored outside the queue */
+function setUp(game, playerBoard, opponentBoard){ /* all current data is stored outside the queue */
   let shipList = document.querySelector('.ships')
   shipList.addEventListener('click', (event) =>{
     let target = event.target
@@ -63,10 +59,12 @@ function setUp(game){ /* all current data is stored outside the queue */
         target = target.parentElement
       }
       if(target.className === 'cell'){
-        switch(target.className){
-          case('cell'):
-            game.updateValidArray(target) /* array items are strings...? */
-        }
+        // console.log(target.value)
+        // switch(target.className){
+        //   case('cell'):
+        //   console.log('case', target.value)
+            game.updateValidArray(target) /*if ship img is clicked within cell, parent cell value targeted */
+        // }
         
       }
       else{
@@ -75,28 +73,28 @@ function setUp(game){ /* all current data is stored outside the queue */
       game.cellAuditColoration()
     }
   }
-  let playerBoard = document.querySelector('.playerBoardContainer')
+  // let playerBoard = document.querySelector('.playerBoardContainer')
   playerBoard.addEventListener('mouseover', handleMouseover)
 
   let playerDOM = document.querySelector('.playerBoardContainer')
 
   playerDOM.addEventListener('mousedown', (event) =>{ /* this event allows for ship direction toggle with scroll click */
-    if(event.button === 1){
-      let newVal = undefined
-      if(game.orient === 'x')
-        newVal = 'y'
-      else{
-        newVal = 'x'
-      }
-      let cell = event.target
-      if(event.target.className === 'ship'){
-        cell = event.target.parentElement /* conveys parent cell instead of img */
-      }
-      
-      game.updateOrient(newVal)
-      game.updateValidArray(cell) 
-      game.cellAuditColoration()
-     
+    if(game.allShipsPlaced() === false){ 
+      if(event.button === 1){
+        let newVal = undefined
+        if(game.orient === 'x')
+          newVal = 'y'
+        else{
+          newVal = 'x'
+        }
+        let cell = event.target
+        if(event.target.className === 'ship'){
+          cell = event.target.parentElement /* conveys parent cell instead of img */
+        }
+        game.updateOrient(newVal)
+        game.updateValidArray(cell)
+        game.cellAuditColoration()
+      }  
     }
   })
 
@@ -104,7 +102,6 @@ function setUp(game){ /* all current data is stored outside the queue */
     let target = event.target
     switch(target.className){
       case('cell'):
-        console.log(target.value)
         if(game.auditRange() === true && game.auditCellOccupied() === true){
           
           (game.currentPlayer).setShip(game.ship, game.validArray, game.orient)
@@ -148,25 +145,66 @@ function setUp(game){ /* all current data is stored outside the queue */
 
   let startGame = document.querySelector('.startGame')
 
-  startGame.addEventListener('click', () =>{
-    if(shipList.childElementCount === 0){
-      playerDOM.removeEventListener('click', handleClick)
-      playerDOM.removeEventListener('mouseover', handleMouseover)
+  // startGame.addEventListener('click', () =>{
+  //   if(shipList.childElementCount === 0){
+  //     playerDOM.removeEventListener('click', handleClick)
+  //     playerDOM.removeEventListener('mouseover', handleMouseover)
       
-      resetPieces.removeEventListener('click', handleReset)
+  //     resetPieces.removeEventListener('click', handleReset)
      
-      gameBegins(playerDOM, game)
-    }
+      gameBegins(game, playerBoard, opponentBoard)
+  //   }
 
-  })
+  // })
+  // REMOVE THESE AFTER DEV
+  // game.changeCurrentPlayer()
+  // gameBegins(game)
 }
 
 
-function gameBegins(playerDOM, game){
-  
+function gameBegins(game, playerBoard, opponentBoard){
+  game.changeCurrentPlayer()
+  opponentBoard = handleOpponentShips(game)
+
+  // let eventToggle = ((target) =>{
+  //   let element1 = opponentBoard, element2 = playerBoard
+
+  //   if(target === 'playerCell'){ element1 = playerBoard, element2 = opponentBoard }
+    
+  //   element1.removeEventListener('click', handleClick)
+  //   element2.addEventListener('click', handleClick)
+  // })
+
+  let handleClick = (event) =>{
+    let target = event.target
+
+    if(target.id === game.currentPlayer.playerType){ 
+      /* playerType =  playerCell or opponentCell to isolate cell ID*/
+      switch(target.className){
+        case('cell'):
+          // Reminder: cell.value = key for coordinate obj
+          let marker = game.attackHandling(target)
+          console.log(marker)
+          target.appendChild(marker)
+
+          // eventToggle(target)
+      }
+    }
+  }
+   
+  opponentBoard.addEventListener('click', handleClick)
+  playerBoard.addEventListener('click', handleClick)
+}
+function handleOpponentShips(game){
+  let opponentBoard = document.querySelector('.opponentBoardContainer')
+  game.defaultShipSelector()/* REMOVE AFTER DEV */
+
+  game.randomShipSet()
+  return opponentBoard
 }
 
 
 console.trace()
 
 init()
+

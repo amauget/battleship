@@ -88,25 +88,6 @@ class GameBoard{
   }
   return array
  }
-  receiveAttack(key){
-    if(this.board[key].selected === false){
-      this.changeSelected(this.board[key])
-
-      if(this.board[key].occupied !== null){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
-        let shipKey = this.board[key].occupied
-        this[shipKey].hit()
-        console.log(this[shipKey])
-        return shipKey
-      }
-      return 'miss'
-    }
-    else{
-      return false /* return value is deferring to bool for whether turn should change */
-    }
-  }
-  changeSelected(item){
-    return item.selected = true
-  }
   setShip(ship, validArray, orientation = 'x'){
     let next = undefined
     if(orientation === 'x'){
@@ -135,6 +116,29 @@ class GameBoard{
   
   resetShipsArray(){
     return this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer]
+  }
+
+  // START GAME
+
+  receiveAttack(key){
+    if(this.board[key].selected === false){
+      this.changeSelected(this.board[key])
+
+      if(this.board[key].occupied !== false){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
+        // console.log('hit')
+        let shipKey = this.board[key].occupied
+        shipKey.hit()
+        return 'hit'
+      }
+      // console.log('miss')
+      return 'miss'
+    }
+    else{
+      return /*Implies cell has already been attacked... Do nothing*/
+    }
+  }
+  changeSelected(item){ /* changes coordinate selected status to true to avoid multiple attacks on a coord */
+    return item.selected = true
   }
 }
 
