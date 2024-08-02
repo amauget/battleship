@@ -60,11 +60,11 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
       }
       if(target.className === 'cell'){
         // console.log(target.value)
-        // switch(target.className){
-        //   case('cell'):
+        switch(target.className){
+          case('cell'):
         //   console.log('case', target.value)
             game.updateValidArray(target) /*if ship img is clicked within cell, parent cell value targeted */
-        // }
+        }
         
       }
       else{
@@ -105,7 +105,7 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
         if(game.auditRange() === true && game.auditCellOccupied() === true){
           
           (game.currentPlayer).setShip(game.ship, game.validArray, game.orient)
-
+          console.log(game.player1.board[target.value])
           game.trimSideBar() 
 
           game.currentPlayer.trimShipsArray(game.ship)
@@ -153,7 +153,7 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
   //     resetPieces.removeEventListener('click', handleReset)
      
       gameBegins(game, playerBoard, opponentBoard)
-  //   }
+    // }
 
   // })
   // REMOVE THESE AFTER DEV
@@ -162,9 +162,11 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
 }
 
 
-function gameBegins(game, playerBoard, opponentBoard){
+function gameBegins(game, playerBoard, opponentBoard){ 
   game.changeCurrentPlayer()
   opponentBoard = handleOpponentShips(game)
+
+  game.handleCompSearch()
 
   // let eventToggle = ((target) =>{
   //   let element1 = opponentBoard, element2 = playerBoard
@@ -183,11 +185,10 @@ function gameBegins(game, playerBoard, opponentBoard){
       switch(target.className){
         case('cell'):
           // Reminder: cell.value = key for coordinate obj
-          let marker = game.attackHandling(target)
-          console.log(marker)
+          let marker = game.attackHandling(target.value)
           target.appendChild(marker)
-
-          // eventToggle(target)
+          
+          game.toggleTurn() //changes turn
       }
     }
   }

@@ -1,5 +1,6 @@
 const { GameBoard } = require("./gameBoard")
 const Alert = require('./alert')
+const Search = require('./search')
 
 class DOM{ /* Class links DOM to GameBoards */
   constructor(){
@@ -8,7 +9,8 @@ class DOM{ /* Class links DOM to GameBoards */
 
     this.alert = new Alert()
 
-    this.currentPlayer = this.player1
+    this.currentPlayer = this.player1 /* toggle to tell who is attacking and being attacked. */
+    this.attackedPlayer = this.player2
 
     this.sideBarList = document.querySelector('ul')
     this.sideBarShips = document.querySelectorAll('.ship')
@@ -18,7 +20,9 @@ class DOM{ /* Class links DOM to GameBoards */
     this.orient = 'x'
     this.validArray = []
     this.count = 0 /* used to navigate to next ship in sideBar */
-    this.shipCoorTrack = [] /* provides the  */
+ 
+    this.search = new Search(this.player1.sunk) /* feeds player1 sunk array to computer search */
+    
   }
 
   /*     PRE-GAME FUNCTIONS    */
@@ -303,9 +307,8 @@ class DOM{ /* Class links DOM to GameBoards */
       this.randomShipSet() 
   }
   /*    GAME FUNCTIONS     */ 
-
   attackHandling(target){ /* fed from event listeners in index -> gameBegins() */
-    let attackStatus = this.currentPlayer.receiveAttack(target.value)
+    let attackStatus = this.currentPlayer.receiveAttack(target)
     let marker = document.createElement('p')
     marker.className = 'marker'
     marker.textContent = 'x'
@@ -316,13 +319,156 @@ class DOM{ /* Class links DOM to GameBoards */
     else if(attackStatus === 'hit'){
       marker.style.color = 'red'
       
-      let ship = this.currentPlayer.board[target.value].occupied
+      let ship = this.currentPlayer.board[target].occupied
   
-      this.alert.hitMessage(ship.name)
+      this.auditSunk(ship)
     }
     // Implement a call to change this.changeCurrentPlayer()
     return marker
   }
+
+  // Attack Functions
+  accessCell(coord){
+    return this.attackedPlayer.board[coord]
+  }
+  appendMarker(coord, marker){
+    let cells = document.querySelectorAll('#opponentCell') 
+    /* CHANGE QUERY TO PLAYER AFTER DEV!!!! */
+    cells.forEach(cell => {
+      if(cell.value === coord){
+        cell.appendChild(marker)
+      }
+    })
+  }
+  // COMPUTER SEARCH DELEGATION
+  searchProcess(){
+    // console.log('STANDARD SEARCH CALLED')
+    //this.search.randomize()....
+    let coord = this.search.pattern.coord
+    let attacked = this.attackedPlayer.board[coord]
+
+    if(attacked.selected === true){
+      this.coordinateAdding()
+    }
+    else{
+      let marker = this.attackHandling(coord)
+
+      this.appendMarker(coord, marker)
+       
+      if(attacked.occupied !== false){
+        this.search.hitSearch = ['up', 'down', 'left', 'right'] //resets for each ship
+        this.search.firstHit = attacked
+        this.hitPattern(coord)
+      }
+      // continues after hitPattern has a recursive break
+      this.coordinateAdding()    
+    }
+    }
+    coordinateAdding(){
+      this.search.addToCoord()
+
+      if(this.search.checkRange() === false){
+        this.search.addNextOrigin()
+        // this.searchProcess()
+      }
+      else if(this.search.checkRange() === 'done' ){
+        return
+      }
+      setTimeout(() =>{
+        this.searchProcess()
+      }, 600)
+  }
+  hitPattern(coord){
+    console.log(coord + 'COORD')
+    // console.log(this.search.hitSearch)
+    let board = this.attackedPlayer.board
+  
+    try{
+      let ship = board[coord].occupied
+      if (ship.sunk === true){
+        console.log('SUNK')
+        return
+      }
+
+      let newCoord = board[coord][this.search.hitSearch[0]].toString() /* coords stored in obj */
+      console.log(newCoord + 'NEW COORD')
+
+      if(board[newCoord].selected === false){ /* NOT YET ATTACKED */
+        let marker = this.attackHandling(newCoord)
+        this.appendMarker(newCoord, marker)
+  
+        if(board[newCoord].occupied === false){ /* MISS --> PROBLEM W/ LOGIC */
+          this.updateHitSearch() //trims array
+          newCoord = this.initialCoord() // reassigns initial hit coordinate
+
+        }
+
+        setTimeout(() =>{
+          this.hitPattern(newCoord)
+        }, 1000)
+        
+      }
+      else{ /* ALREADY ATTACKED */
+        this.updateHitSearch() //trims array
+        coord = this.initialCoord() // reassigns initial hit coordinate
+      }
+      
+        
+    }
+    catch(error){ /* OUT OF RANGE --> PROBLEM WITH LOGIC */
+      if(error instanceof TypeError){
+        console.log('TEST')
+         /* removes direction that led off board */
+        this.updateHitSearch() //trims array
+        coord = this.initialCoord() // reassigns initial hit coordinate
+        setTimeout(() =>{
+          console.log(this.search.hitSearch[0])
+          this.hitPattern(coord) /* maintains OG position */
+        }, 5000)
+      }
+    }
+  
+  }
+  
+
+  // STATE MONITORING AND ALTERATION
+  handleCompSearch(){
+    if(this.search.huntingShip === false){
+      this.searchProcess
+    }
+    else{
+      this.hitPattern()
+    }
+  }
+  auditSunk(ship){
+    if(ship.sunk === true){
+      this.currentPlayer.sunk.push(ship)
+
+      this.alert.sunkMessage(ship.name)
+    }
+    else{
+      this.alert.hitMessage(ship.name)
+    }
+  }
+  toggleTurn(){
+    if(this.currentPlayer === this.player1){
+      return this.currentPlayer = this.player2, this.attackedPlayer = this.player1
+    }
+    else{
+      return this.currentPlayer = this.player1, this.attackedPlayer = this.player2
+    }
+    
+
+  }
+  initialCoord(){
+    return this.search.firstHit.coordinates.toString()
+  }
+  updateHitSearch(){
+    return (this.search.hitSearch).splice(0,1)
+  }
+  // async checkTurn(){
+
+  // }
 }
 
 module.exports = DOM
