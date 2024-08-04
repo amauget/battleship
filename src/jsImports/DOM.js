@@ -341,13 +341,13 @@ class DOM{ /* Class links DOM to GameBoards */
     })
   }
   // COMPUTER SEARCH DELEGATION
-  searchProcess(){
-    // console.log('STANDARD SEARCH CALLED')
-    //this.search.randomize()....
-    let coord = this.search.pattern.coord
-    let attacked = this.attackedPlayer.board[coord]
+  standardSearch(){
+    // console.log(this.search.pattern)
+    let coord = this.search.pattern.coord //proposed attack coords
+    
+    let attacked = this.attackedPlayer.board[coord] //associated coord cell data
 
-    if(attacked.selected === true){
+    if(attacked.selected === true){ //has already been attacked
       this.coordinateAdding()
     }
     else{
@@ -356,15 +356,16 @@ class DOM{ /* Class links DOM to GameBoards */
       this.appendMarker(coord, marker)
        
       if(attacked.occupied !== false){
-        this.search.hitSearch = ['up', 'down', 'left', 'right'] //resets for each ship
-        this.search.firstHit = attacked
-        this.hitPattern(coord)
+        this.resetSearchData(attacked.coordinates) /* resets hitSearch array & logs the first hit coord */
+        return this.search.huntingShip = true
+        //tells handleCompSearch() to call hitSearch() until ship has sunk.
       }
-      // continues after hitPattern has a recursive break
       this.coordinateAdding()    
     }
-    }
-    coordinateAdding(){
+  }
+
+  coordinateAdding(){ /* actual pattern for standard search */
+      this.auditSearchGap()
       this.search.addToCoord()
 
       if(this.search.checkRange() === false){
@@ -374,81 +375,86 @@ class DOM{ /* Class links DOM to GameBoards */
       else if(this.search.checkRange() === 'done' ){
         return
       }
-      setTimeout(() =>{
-        this.searchProcess()
-      }, 600)
+ 
   }
-  hitPattern(coord){
-    console.log(coord + 'COORD')
-    // console.log(this.search.hitSearch)
+  resetSearchData(attacked){  // only called after first hit.
+    this.search.hitSearch = ['up', 'down', 'left', 'right'] //resets for each ship
+
+    this.search.firstHit = attacked
+    this.search.lastHit = attacked
+  }
+
+  hitSearch(coord){ //coord obj
     let board = this.attackedPlayer.board
   
     try{
       let ship = board[coord].occupied
-      if (ship.sunk === true){
-        console.log('SUNK')
+     
+      this.auditSunk(ship) //includes huntingShip toggle for sunk
+      if(this.search.huntingShip === false){
         return
       }
+      coord = board[coord][this.search.hitSearch[0]].toString() /* coords stored in obj */
 
-      let newCoord = board[coord][this.search.hitSearch[0]].toString() /* coords stored in obj */
-      console.log(newCoord + 'NEW COORD')
-
-      if(board[newCoord].selected === false){ /* NOT YET ATTACKED */
-        let marker = this.attackHandling(newCoord)
-        this.appendMarker(newCoord, marker)
+      if(board[coord].selected === false){ /* NOT YET ATTACKED */
+        let marker = this.attackHandling(coord)
+        this.appendMarker(coord, marker)
   
-        if(board[newCoord].occupied === false){ /* MISS --> PROBLEM W/ LOGIC */
-          this.updateHitSearch() //trims array
-          newCoord = this.initialCoord() // reassigns initial hit coordinate
-
-        }
-
-        setTimeout(() =>{
-          this.hitPattern(newCoord)
-        }, 1000)
-        
-      }
-      else{ /* ALREADY ATTACKED */
-        this.updateHitSearch() //trims array
-        coord = this.initialCoord() // reassigns initial hit coordinate
-      }
+        if(board[coord].occupied !== false){/* ___HIT___ */
+          return this.search.lastHit = coord 
       
-        
+        }
+      }
+     //CALLS BELOW FOR MISS, AND ALREADY ATTACKED
+      this.updateHitSearch() //trims search array
+      this.initialCoord() // reassigns initial hit coordinate to firstHit
     }
-    catch(error){ /* OUT OF RANGE --> PROBLEM WITH LOGIC */
+    catch(error){ /* OUT OF RANGE */
       if(error instanceof TypeError){
-        console.log('TEST')
+        // console.log('TEST')
          /* removes direction that led off board */
         this.updateHitSearch() //trims array
-        coord = this.initialCoord() // reassigns initial hit coordinate
-        setTimeout(() =>{
-          console.log(this.search.hitSearch[0])
-          this.hitPattern(coord) /* maintains OG position */
-        }, 5000)
+        return this.search.lastHit = this.initialCoord() // reassigns initial hit coordinate
       }
     }
   
   }
-  
-
   // STATE MONITORING AND ALTERATION
-  handleCompSearch(){
+  handleCompSearch(){ /* recursion here.. not in the search functions */
+     //this.search.randomize()....
     if(this.search.huntingShip === false){
-      this.searchProcess
+
+      this.standardSearch() //resets to first hit before finding next coord
     }
     else{
-      this.hitPattern()
+        this.hitSearch(this.search.lastHit)
     }
+
+    setTimeout(() =>{this.handleCompSearch()}, 600)
   }
   auditSunk(ship){
     if(ship.sunk === true){
       this.currentPlayer.sunk.push(ship)
 
-      this.alert.sunkMessage(ship.name)
+      // this.alert.sunkMessage(ship.name)
+
+      return this.search.huntingShip = false /* handleCompSearch() used for stdSearch vs hitSearch */
+
     }
     else{
-      this.alert.hitMessage(ship.name)
+      // this.alert.hitMessage(ship.name)
     }
+  }
+  auditSearchGap(){
+    let ships = this.attackedPlayer.sunk
+    ships = ships.sort((shortest, longest) => shortest.length - longest.length)
+    if(ships.length !== 0){
+      if(ships[0].name === 'destroyer'){
+        this.search.updateSearchInfo(3)
+        this.gap = 3
+      }
+    }
+   
   }
   toggleTurn(){
     if(this.currentPlayer === this.player1){
@@ -461,14 +467,13 @@ class DOM{ /* Class links DOM to GameBoards */
 
   }
   initialCoord(){
-    return this.search.firstHit.coordinates.toString()
+    return this.search.lastHit = this.search.firstHit
   }
   updateHitSearch(){
     return (this.search.hitSearch).splice(0,1)
   }
-  // async checkTurn(){
 
-  // }
+  
 }
 
 module.exports = DOM
