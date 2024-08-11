@@ -10,7 +10,7 @@ class DOM{ /* Class links DOM to GameBoards */
     this.alert = new Alert()
 
     this.currentPlayer = this.player1 /* toggle to tell who is attacking and being attacked. */
-    this.attackedPlayer = this.player1
+    this.attackedPlayer = this.player2
 
     this.sideBarList = document.querySelector('ul')
     this.sideBarShips = document.querySelectorAll('.ship')
@@ -92,7 +92,6 @@ class DOM{ /* Class links DOM to GameBoards */
         colElement.id = cellId
 
         rowElement.appendChild(colElement)  
-         
       }
       div.appendChild(rowElement)
     }
@@ -160,8 +159,12 @@ class DOM{ /* Class links DOM to GameBoards */
     img.style.background = 'none'
     img.style.zIndex = 0;
     if(this.orient === 'x'){
-        cell.style.transform = 'rotate(270deg)' 
-        /* rotating the cell keeps the image origin in the same spot.  */
+        img.style.transform = 'rotate(-90deg)' 
+        img.style.marginTop = '30px'
+        img.style.marginLeft = '-50px'
+        img.style.position = 'static'
+        img.style.bottom = '0px'
+        
     }
     else{
       cell.style.transform = 'rotate(180deg)'
@@ -309,7 +312,7 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   /*    GAME FUNCTIONS     */ 
   attackHandling(target){ /* fed from event listeners in index -> gameBegins() */
-    let attackStatus = this.currentPlayer.receiveAttack(target)
+    let attackStatus = this.attackedPlayer.receiveAttack(target)
     let marker = document.createElement('p')
     marker.className = 'marker'
     marker.textContent = 'x'
@@ -320,11 +323,10 @@ class DOM{ /* Class links DOM to GameBoards */
     else if(attackStatus === 'hit'){
       marker.style.color = 'red'
       
-      let ship = this.currentPlayer.board[target].occupied
+      let ship = this.attackedPlayer.board[target].occupied
   
       this.auditSunk(ship)
     }
-    console.log(marker, ' marker', target, ' target', this.currentPlayer.board[target])
     // Implement a call to change this.changeCurrentPlayer()
     return marker
   }
@@ -479,11 +481,8 @@ class DOM{ /* Class links DOM to GameBoards */
     return count
   }
   // STATE MONITORING AND ALTERATION
-  handleCompSearch(count = 0){ /* recursion here.. not in the search functions */
-     //this.search.randomize()....
-     count += 1
+  handleCompSearch(){ /* recursion here.. not in the search functions */
     if(this.attackedPlayer.sunk.length === 5){
-      console.log(count)
       return
     }
     else if(this.search.huntingShip === false){
@@ -499,7 +498,6 @@ class DOM{ /* Class links DOM to GameBoards */
         this.hitSearch(this.search.lastHit)
     }
 
-    setTimeout(() =>{this.handleCompSearch(count)}, 150)
   }
   auditSunk(ship){
     if(ship.sunk === true){
@@ -542,11 +540,9 @@ class DOM{ /* Class links DOM to GameBoards */
     if(this.currentPlayer === this.player1){
       return this.currentPlayer = this.player2, this.attackedPlayer = this.player1
     }
-    else{
+    else if(this.currentPlayer === this.player2){
       return this.currentPlayer = this.player1, this.attackedPlayer = this.player2
     }
-    
-
   }
   initialCoord(){
     return this.search.lastHit = this.search.firstHit

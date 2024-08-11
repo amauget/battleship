@@ -245,6 +245,7 @@ h4{
 }
 #markerWithShip{ /* see DOM.js appendMarker() for class marker class switch */
   transform: rotate(-270deg);
+
   justify-self: center;
   align-self: center;
   
