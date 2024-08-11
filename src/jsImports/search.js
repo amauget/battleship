@@ -3,7 +3,7 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = 'one' /* CHANGE TO RANDOMIZE FUNCTION!!!!!!!!!!! */
+    this.origin = this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
@@ -22,30 +22,56 @@ class Search{
   searchInfo(){
     let search = { /*  */
       one: {start: '0,1', addToStart: [0, this.gap], addToHalfway: [this.gap, 0], coord: '0,1', addToCoord: [1,-1]},
-      two: {start: '8,9', addToStart:[-this.gap, 0], addToHalway: [0, -this.gap], coord:'8,9', addToCoord:[1,-1]}
+      two: {start: '8,9', addToStart:[-this.gap, 0], addToHalfway: [0, -this.gap], coord:'8,9', addToCoord:[1,-1]},
+      three: {start: '0,9', addToStart:[this.gap, 0], addToHalfway: [0, this.gap], coord:'0,9', addToCoord: [1,-1]}, /* works from halfway to right corner then starts @ 0,1 */
+      four: {start: '0,9', addToStart:[0, -this.gap], addToHalfway: [-this.gap, 0], coord: '0,9', addToCoord: [1,-1]}
     }
     return search[this.origin]
   }
-  updateSearchInfo(value){
-    console.log(value, ' value')
-    let index1 = this.pattern.addToStart.indexOf(this.gap)
-    this.pattern.addToStart[index1] = value
+  randomizeOrigin(){
+    let originArray = ['one', 'two', 'three', 'four']
 
-    let index2 = this.pattern.addToHalfway.indexOf(this.gap)
-    this.pattern.addToHalfway[index2] = value
+    let index = Math.floor(Math.random() * 4)
+    return originArray[index]
+  }
+  updateSearchInfo(){
 
-    console.log(index1, ' index1')
+    if(this.origin === 'two' || this.origin === 'four'){
+      this.gap *= -1
+      // this.pattern.addToStart = [this.gap, 0], this.pattern.addToHalfway = [0, this.gap] 
+    }
+   
+    for(let i = 0; i < this.pattern.addToStart.length; i++){
+      // console.log(this.pattern.addToStart[i], ' add to start')
+      if(this.pattern.addToStart[i] !== 0){
+        this.pattern.addToStart[i] = this.gap
+      
+      }
+      if(this.pattern.addToHalfway[i] !== 0){
+        this.pattern.addToHalfway[i] = this.gap
+      }
+    }
   }
   // SEARCH INCREMENTS
  
   addNextOrigin(){ /* called when next hypotenuse is ready to be traversed. */
     let adder = this.pattern.addToStart /* array */
     let start = (this.pattern.start).split(',')
-    console.log(adder)
     /* x and y axis */
     let x = parseInt(start[0]) + adder[0]
     let y = parseInt(start[1]) + adder[1]
-
+    if(this.origin === 'three' && ((x > 9 && y >= 7)||(x > 9 && y < 0))){
+      x = 0
+      y = -1 + this.gap
+      this.pattern.addToStart = this.pattern.addToHalfway
+    }
+    else if(this.origin === 'four' && ( y < 0 && x === 0)){
+      x = 10 - Math.abs(this.gap)
+      y = 9
+      this.pattern.addToStart = this.pattern.addToHalfway
+    }
+    // console.log(this.gap)
+    // console.log(x, y, ' addNextOrigin')
     this.pattern.start = `${x},${y}`
     this.pattern.coord = this.pattern.start
     return this.pattern
@@ -63,19 +89,34 @@ class Search{
   checkRange(){
     let x = parseInt((this.pattern.coord.split(','))[0])
     let y = parseInt((this.pattern.coord.split(','))[1])
-    if(x === 10){
+    // console.log('check range')
+    // console.log(this.pattern)
+    // console.log(x, y)
+    if(this.origin === 'one' && x === 10){
       this.pattern.addToStart = this.pattern.addToHalfway
     }
-    if(x === 10 && y === 9){
-      return 'done'
+    if(this.origin === 'two' && x === -1){
+      this.pattern.addToStart = this.pattern.addToHalfway
     }
-    return y < 0 || x === 10 ? false : true
+    if(this.origin === 'three' && x > 9 && y >= 7 ){ /* 7 is minimum y value when x is out of bounds at corner */
+      this.pattern.addToStart = this.pattern.addToHalfway
+      this.pattern.start = '0,-1'
+      this.pattern.coord = '0,-1'
+      console.log(this.pattern)
+    }
+    if(this.origin === 'four' && y < 0 && x === 2){
+      console.log('!!!!TEST!!!!!!!!!!!!!!!!!!!!!!!')
+      console.log(x, y)
+      this.pattern.addToStart = this.pattern.addToHalfway
+      this.pattern.start = '11,9'
+      this.pattern.coord = '11,9'
+    }
+    return y < 0 || y > 9 || x < 0 || x > 9 ? false : true /* false: new start, true: keep going down */
+
   }
   changeGap(increment){
     return this.gap = increment
   }
-
-
 }
 
 module.exports = Search

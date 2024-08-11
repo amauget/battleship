@@ -17,18 +17,15 @@ function init(){
 
   // game.alert.welcome()
 
-/* remove after dev  */
-
- /*^^^ remove after dev ^^^  */
-
   // let okayBtn = document.querySelector('.okay')
   // okayBtn.addEventListener('click', () =>{
   //   game.alert.hide()
     setUp(game, playerBoardContainer, opponentBoard)
-  // })
+//   })
 }
 function setUp(game, playerBoard, opponentBoard){ /* all current data is stored outside the queue */
   let shipList = document.querySelector('.ships')
+
   shipList.addEventListener('click', (event) =>{
     let target = event.target
     switch(target.className){
@@ -105,7 +102,6 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
         if(game.auditRange() === true && game.auditCellOccupied() === true){
           
           (game.currentPlayer).setShip(game.ship, game.validArray, game.orient)
-          console.log(game.player1.board[target.value])
           game.trimSideBar() 
 
           game.currentPlayer.trimShipsArray(game.ship)
@@ -145,17 +141,17 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
 
   let startGame = document.querySelector('.startGame')
 
-  // startGame.addEventListener('click', () =>{
-  //   if(shipList.childElementCount === 0){
-  //     playerDOM.removeEventListener('click', handleClick)
-  //     playerDOM.removeEventListener('mouseover', handleMouseover)
+  startGame.addEventListener('click', () =>{
+    if(shipList.childElementCount === 0){
+      playerDOM.removeEventListener('click', handleClick)
+      playerDOM.removeEventListener('mouseover', handleMouseover)
       
-  //     resetPieces.removeEventListener('click', handleReset)
+      resetPieces.removeEventListener('click', handleReset)
      
       gameBegins(game, playerBoard, opponentBoard)
-    // }
+    }
 
-  // })
+  })
   // REMOVE THESE AFTER DEV
   // game.changeCurrentPlayer()
   // gameBegins(game)
@@ -201,6 +197,8 @@ function handleOpponentShips(game){
   game.defaultShipSelector()/* REMOVE AFTER DEV */
 
   game.randomShipSet()
+
+  game.currentPlayer = game.player1
   return opponentBoard
 }
 

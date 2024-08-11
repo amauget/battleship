@@ -1,9 +1,134 @@
+@font-face {
+  font-family: 'typeWriter';
+  src: url('./jsImports/externalItems/fonts/Typewriter.otf') format('opentype');
+  font-weight: bolder;
+  font-style: normal;
+}
+:root{
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  cursor: crosshair;
+  /* font-family: 'typeWriter'; */
+  font-weight: 100;
+}
 body{
   display: grid;
   grid-template-rows: repeat(4, auto);
   grid-template-columns: auto, min-content;
   justify-content: center;
   gap:1vh;
+  font-family: 'typeWriter';
+  background-image: url(./externalItems/oceanHorizon.jpg);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position-y: 50% ;
+}
+
+.header{
+  grid-row: 1/2;
+  grid-column: 1/3;
+  display: grid;
+  justify-content: center;
+
+  /* background-image: url(./jsImports/externalItems/battleship.jpg); */
+  background-repeat: no-repeat;
+  background-position-y: 15%;
+  
+}
+.header>h1{
+  grid-row: 1/2;
+  grid-column: 1/2;
+  color:rgb(253, 253, 253);
+  margin: 0;
+  align-self: end;
+  justify-self: center;
+  font-family: 'typeWriter';
+}
+.battleshipImg{
+  grid-row: 1/2;
+  grid-column: 1/2;
+  width:50vw;
+  max-width: 600px;
+  z-index: -1000
+}
+#alert{ /* both welcome and alert are different id's for alert window */
+  position:fixed;
+  bottom:50;
+  right: 5vw;
+}
+#welcome{
+  grid-column: 1/3;
+  grid-row: 3/4;
+}
+.alert{
+
+  z-index: 1000;
+  border: solid 1px black;
+  background-color:#f6eee3;
+  justify-self: center;
+  align-self: center;
+
+
+  display: grid;
+  grid-template-columns: auto min-content;
+  grid-template-rows:repeat(4, min-content);
+
+  max-width: 35vw;
+  font-family: 'typeWriter';
+
+
+}
+.admiral{
+  grid-column: 2/3;
+  grid-row: 1/3;
+  height:8rem;
+  width: auto;
+
+}
+.command{
+  grid-row: 1/2;
+  grid-column: 1/2;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0;
+  margin-left: 1rem;
+  justify-self: center;
+}
+.message{
+  grid-column: 1/2;
+  grid-row: 2/3;
+  margin: 0;
+  margin-left: 1rem;
+
+}
+.hint{
+  grid-column: 1/3;
+  grid-row: 3/4;
+  grid-column: 1/2;
+  justify-self: center;
+  margin-left: 1rem;
+  font-size: .85rem;
+}
+.okay{
+  grid-row: 4/5;
+  grid-column: 1/3;
+  justify-self: center;
+
+  height: 2.5rem;
+  width: 10rem;
+  font-size: 1.2rem;
+  border-radius: 15px;
+  border: none;
+  background-color: navy;
+  
+  font-family: 'typeWriter';
+  color: white;
+  margin-bottom: 1rem;
+}
+.okay:hover{
+  background-color: rgba(0, 0, 128, 0.605);
+  cursor: pointer;
 }
 .opponentBoard{
   grid-row: 2/3;
@@ -12,33 +137,58 @@ body{
   background-size: 100%;
   background-repeat: no-repeat;
 }
-.playerBoardContainer{
-  grid-row: 3/4;
-  grid-column: 1/2;
+.playerBoardContainer, .opponentBoardContainer{
+
   display:grid;
   grid-template-rows: repeat(2, min-content);
   grid-template-columns: repeat(3, fit-content);
+  padding: 20px;
+  align-self: end;
+}
+.playerBoardContainer{
+  grid-row: 3/4;
+  grid-column: 2/3;
+  padding-right: 5rem
+}
+.opponentBoardContainer{
+  grid-row: 3/4;
+  grid-column: 1/2;
+}
+h4{
+  grid-row: 1/2;
+  grid-column: 1/3;
+  font-size: 2rem;
+  justify-self: center;
+
+
 }
 .letterCoordinates{
-  grid-row: 1/2;
+  grid-row: 2/3;
   grid-column: 1/2;
   display: grid;
   height:100%;
   grid-template-rows: repeat(10, auto);
-  gap:0
+  gap:0;
+  font-size: 1.5rem;
 }
 .numberCoordinates{
-  grid-row: 2/3;
+  grid-row: 3/4;
   grid-column: 1/3;
   display: grid;
   grid-template-columns: repeat(11, auto);
+  font-size: 1.5rem;
 }
 .playerBoard{
-  grid-row: 1/3;
+  grid-row: 2/4;
   grid-column: 2/3;
-
+  
   background-image: url(https://images.pexels.com/photos/5326990/pexels-photo-5326990.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1);
   background-size: 100%;
+}
+.opponentBoard{
+  grid-row: 2/4;
+  grid-column: 2/3;
+ 
 }
 
 .playerBoard, .opponentBoard{
@@ -49,11 +199,12 @@ body{
   gap:0;
   height: fit-content;
   width: fit-content;
-  margin-right: 10px;
 
 }
 
-
+#x{
+  background-color: rgba(255, 0, 0, 0.276);
+}
 
 #row{
   display: grid;
@@ -67,13 +218,44 @@ body{
 .one{grid-row: 9;} .zero{grid-row: 10;}
 
 .cell, .coord{
-  border:solid .5px black;
-  height: 2rem;
-  width: 2rem;
+  border:solid .1px black;
+  height: 4rem;
+  width: 4rem;
   justify-self: center;
   color: none;
-  justify-self: end;
+
 }
+.cell{
+  position: relative;
+  display: grid;
+  text-align: center;
+  justify-content: center;
+}
+.marker{
+  position: absolute;
+  /* left:0;
+  bottom: 10px; */
+  font-size: 3rem;
+  margin:0;
+  text-align: center;
+  z-index: 2;
+  transform: rotate(180deg);
+  justify-self: center ;
+
+}
+#markerWithShip{ /* see DOM.js appendMarker() for class marker class switch */
+  transform: rotate(-270deg);
+  justify-self: center;
+  align-self: center;
+  
+  
+}
+.cell>.ship{
+  position: static;
+  z-index: 1;
+  
+}
+
 .coord{
   padding-top: .25vh;
   border:  none;
@@ -86,67 +268,71 @@ body{
 }
 .sideBar{
   grid-row: 3/4;
-  grid-column: 2/3;
+  grid-column: 3/4;
 
   justify-self: center;
-/* 
-  margin-left: 20px; */
 
   display:grid;
   grid-template-rows: repeat(2, fit-content);
-
-  padding: 8%;
+  grid-template-columns: 25rem;
+  margin-left: 20px;
+  
   font-size: 1.4rem;
-  background-color: beige;
+  background-color: rgb(204, 204, 204);
   border: 2px solid black;
+  /* width:15rem; */
   
 }
 
 .toggle{
   grid-row: 1/2;
   grid-column: 1/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem
 }
 .sideBar .ships{
   width: 8rem;
-  justify-content: center;
+  justify-self: center;
   display: grid;
   grid-template-rows: repeat(5, 10vh);
   grid-template-columns: repeat(1, min-content);
   align-self: start;
   list-style: none;
 }
-.ships img{
+.ships> img{
   transform: rotate(90deg);
   margin:0;
   border-radius: 15px;
-  z-index: 1000;
+
   align-self: center;
   justify-self: center;
 }
+
 .ship:hover{
-  background-color: rgba(16, 0, 241, 0.459);
-  cursor: pointer;
-}
-/* cell height/width = 2 rem */
-#carrier{  /* 5:1 height */
-  height: 10rem;
-  width: 2rem;
-  grid-row: 1/2;
-  grid-column: 1/2;
- 
   background-color: rgba(16, 0, 241, 0.459);
 }
 
+/* cell height/width = 2 rem */
+#carrier{  /* 5:1 height */
+  height: 20rem;
+  width: 4rem;
+  grid-row: 1/2;
+  grid-column: 1/2;
+  background: rgb(255, 0, 0, 0.275)
+}
+
 #battleship{
-  height: 8rem;
-  width: 1.6rem;
+  height: 16rem;
+  width: 3rem;
 
   grid-row: 2/3;
   grid-column: 1/2;
 }
 #cruiser, #submarine{
-  height: 6rem;
-  width: 1.2rem;
+  height: 12rem;
+  width: 2.5rem;
 }
 
 #submarine{
@@ -155,9 +341,9 @@ body{
 #cruiser{
   grid-row: 4/5;
 }
-#destroyer{
-  height: 4rem;
-  width: 1rem;
+#destroyer{ 
+  height: 8rem;
+  width: 2rem;
   grid-row: 5/6;
 }
 
@@ -178,3 +364,21 @@ body{
   margin-left: 5vw;
   margin-top: 10px;
 }
+.startGame, .resetPieces, .orient{
+  font-size: 1.5rem;
+  background-color: rgb(255, 255, 255);
+
+  border:none;
+  border-radius: 15px;
+  width: 12rem;
+  font-family: 'typeWriter';
+}
+.orient{
+  width: 9rem;
+ 
+}
+.startGame:hover, .resetPieces:hover, .orient:hover{
+  cursor: pointer;
+  background-color: rgb(183, 182, 182);
+}
+
