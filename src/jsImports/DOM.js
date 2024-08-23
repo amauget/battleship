@@ -303,6 +303,7 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   /*    GAME FUNCTIONS     */ 
   attackHandling(target, player){ /* fed from event listeners in index -> gameBegins() */
+   
     let attackStatus = player.receiveAttack(target)
     let marker = document.createElement('p')
     marker.className = 'marker'
@@ -356,24 +357,21 @@ class DOM{ /* Class links DOM to GameBoards */
     let coord = this.search.pattern.coord //proposed attack coords
   
     let attacked = this.player1.board[coord] //associated coord cell data
-    // if(){
-
-    // }
     if(attacked === undefined || attacked.selected === true){ 
       /* when starting sweep begins out of bounds or has already been attacked */
-      console.log(coord)
       this.coordinateAdding()
+     
       this.handleCompSearch()
     }
     else{ 
-      
       let marker = this.attackHandling(coord, this.player1)
 
       this.appendMarker(coord, marker)
         
       if(attacked.occupied !== false){
-        this.resetSearchData(attacked.coordinates) /* resets hitSearch array & logs the first hit coord */
-        return this.search.huntingShip = true
+        this.resetSearchData(attacked.coordinates.toString()) /* resets hitSearch array & logs the first hit coord */
+        this.search.huntingShip = true
+  
         //tells handleCompSearch() to call hitSearch() until ship has sunk.
       }
       this.coordinateAdding()    
@@ -386,7 +384,6 @@ class DOM{ /* Class links DOM to GameBoards */
       this.search.changeCoordAdder()
 
       if(this.search.checkRange() === false){
-        console.log('checkRange === false!!!')
         this.search.addNextOrigin()
       }
   }
@@ -395,18 +392,20 @@ class DOM{ /* Class links DOM to GameBoards */
 
     this.search.firstHit = cell
     this.search.lastHit = cell
+    console.log(this.search)
   }
   hitSearch(coord){ //coord obj
     let board = this.player1.board
     // this.search.multipleShips() 
-    console.log(coord)
+
     try{
       let ship = board[coord].occupied
      
       this.auditSunk(ship) //includes huntingShip toggle for sunk
 
       if(this.search.huntingShip === false){ //breaks recursion
-        // this.handleCompSearch()
+        console.log('breaking out of recursion in HIT SEARCH: ', coord) // only breaks out after sweep has restarted...f
+        this.handleCompSearch()
         return
       }
       let direction = this.search.hitSearch[0]
@@ -431,7 +430,7 @@ class DOM{ /* Class links DOM to GameBoards */
          /* removes direction that led off board */
         this.updateHitSearch() //trims array
         this.search.lastHit = this.initialCoord() // reassigns initial hit coordinate
-        this.hitSearch(this.search.lastHit)
+        this.handleCompSearch()
       }
     }
   }
@@ -466,12 +465,8 @@ class DOM{ /* Class links DOM to GameBoards */
   } */
   // STATE MONITORING AND ALTERATION
 
-  handleCompSearch(){ /* recursion here.. not in the search functions */
-    // console.log(this.search.hitLog)
-    // console.log(this.search.missCount, ' miss count')
-    // console.log(this.search.hitCount, ' hit count')
-    // console.log(this.search.multiShips, ' multiships')
-    // console.log(this.search.huntingShip, ' hunting ship')
+  async handleCompSearch(){ /* recursion here.. not in the search functions */
+
     if(this.player1.sunk.length === 5){
       return
     }
@@ -480,6 +475,7 @@ class DOM{ /* Class links DOM to GameBoards */
     }
     //This way, ships origin can be entered from this.hitLog[0]
     else{
+
         this.hitSearch(this.search.lastHit) //change to this.hitLog[0]?
     }
   }
@@ -491,19 +487,17 @@ class DOM{ /* Class links DOM to GameBoards */
       if(this.search.multiShips === false){
         this.search.hitLog = []
         this.search.huntingShip = false /* handleCompSearch() used for stdSearch vs hitSearch */
-        
-        this.handleCompSearch() // Callback to prevent computer losing its turn.
+        console.log('huntingShip = false')
+        // this.hitSearch(this.ship.lastHit)
+        // this.handleCompSearch() // Callback to prevent computer losing its turn.
       }
       else if(this.search.multiShips === true && this.search.hitLog.length === 0){
-        console.log('Toggle back from multiships...')
         this.search.multiShips = false
         this.search.huntingShip = false
       }
       else{
-        console.log(ship)
-        this.search.trimHitLog()  
-        this.search.prepShipInfo() /* changes this.lastHit to hitLog[0] and resets this.hitSearch */
-        console.log(this.search.lastHit)
+        // this.search.trimHitLog()  
+        // this.search.prepShipInfo() /* changes this.lastHit to hitLog[0] and resets this.hitSearch */
       }
 
     }
