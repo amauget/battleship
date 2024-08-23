@@ -3,7 +3,7 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = 'four' //this.randomizeOrigin()
+    this.origin = 'one'//this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
