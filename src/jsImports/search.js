@@ -3,20 +3,20 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = this.randomizeOrigin()
+    this.origin = 'four' //this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
     this.lastHit = ''
 
-
-
-    // this.lastAttack = 'hit' // only referenced after hit, so defaults as hit.
+    this.hitLog = [] /* "firstHit" coordinates are pushed here if determined that more than one ship is attacked */
+    this.hitCount = 0
+    this.missCount = 0
+    this.multiShips = false // if ships are aligned during search toggles to true
+    // used to control when this.hitLog pushes data
 
     this.hitSearch = ['up', 'down', 'left', 'right']
     this.huntingShip = false
-
-    // add a hit coord tracker
   }
   // INITIALIZATION 
   searchInfo(){
@@ -42,7 +42,6 @@ class Search{
     }
    
     for(let i = 0; i < this.pattern.addToStart.length; i++){
-      // console.log(this.pattern.addToStart[i], ' add to start')
       if(this.pattern.addToStart[i] !== 0){
         this.pattern.addToStart[i] = this.gap
       
@@ -70,14 +69,12 @@ class Search{
       y = 9
       this.pattern.addToStart = this.pattern.addToHalfway
     }
-    // console.log(this.gap)
-    // console.log(x, y, ' addNextOrigin')
     this.pattern.start = `${x},${y}`
     this.pattern.coord = this.pattern.start
     return this.pattern
   }
 
-  addToCoord(){ /* hypotenuse traversal of grid */
+  changeCoordAdder(){ /* hypotenuse traversal of grid */
     let adder = this.pattern.addToCoord
     let coord = this.pattern.coord.split(',')
     // x and y axis
@@ -89,10 +86,9 @@ class Search{
   checkRange(){
     let x = parseInt((this.pattern.coord.split(','))[0])
     let y = parseInt((this.pattern.coord.split(','))[1])
-    // console.log('check range')
-    // console.log(this.pattern)
-    // console.log(x, y)
-    if(this.origin === 'one' && x === 10){
+
+    if(this.origin === 'one' && (x === 10 || y > 9)){
+      console.log('add to halfway')
       this.pattern.addToStart = this.pattern.addToHalfway
     }
     if(this.origin === 'two' && x === -1){
@@ -105,17 +101,57 @@ class Search{
       console.log(this.pattern)
     }
     if(this.origin === 'four' && y < 0 && x === 2){
-      console.log('!!!!TEST!!!!!!!!!!!!!!!!!!!!!!!')
-      console.log(x, y)
       this.pattern.addToStart = this.pattern.addToHalfway
       this.pattern.start = '11,9'
       this.pattern.coord = '11,9'
+    }
+    if(this.origin === 'one' || this.origin === 'two'){
+      return y < 0 || x === 10 ? false : true
+
     }
     return y < 0 || y > 9 || x < 0 || x > 9 ? false : true /* false: new start, true: keep going down */
 
   }
   changeGap(increment){
     return this.gap = increment
+  }
+
+  /* NEIGHBORING SHIPS */
+
+  multipleShips(){
+    if(this.missCount > 1 && this.hitCount > 1){ /* more than 1 ship found */  
+      return this.multiShips = true
+    }
+
+  }
+  trimHitLog(){
+    return this.hitLog.splice(0,1)
+  }
+  prepShipInfo(){
+    this.lastHit = this.hitLog[0]
+    this.hitSearch = ['up', 'down', 'left', 'right']
+    /* 
+    Ways to determine:
+      1. gather hit and miss count since hunting ship became true.
+        if miss > 1 and ship hasn't sunk, multiple ships = hit count
+    */
+  }
+  auditHitLogLength(){
+    if(this.hitLog.length === 0){
+      this.hitCount = 0
+      return this.multiShips = false
+    }
+  }
+  updateAttackCounts(status, player){
+    if(player.playerType === 'playerCell'){
+      if(status === 'hit'){
+        this.hitCount ++
+      }
+      else{
+        this.missCount ++
+      }
+    }
+ 
   }
 }
 
