@@ -481,8 +481,6 @@ class DOM{ /* Class links DOM to GameBoards */
   // STATE MONITORING AND ALTERATION
 
   handleCompSearch(){ /* recursion here.. not in the search functions */
-
-  handleCompSearch(){ /* recursion here.. not in the search functions */
     // console.log(this.search.hitLog)
     // console.log(this.search.missCount, ' miss count')
     // console.log(this.search.hitCount, ' hit count')
