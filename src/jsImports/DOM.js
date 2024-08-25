@@ -26,7 +26,7 @@ class DOM{ /* Class links DOM to GameBoards */
     this.difficulty = 'extreme'
   }
 
-  /*     PRE-GAME FUNCTIONS    */
+  /*          PRE-GAME FUNCTIONS          */
   
   allShipsPlaced(){ /* REMEMBER TO CHANGE CURRENT PLAYER */
     let shipList = this.currentPlayer.shipsArray
@@ -213,7 +213,7 @@ class DOM{ /* Class links DOM to GameBoards */
     return newSideBarShips /* updates this.sideBarShips */
   }
 
-  /*    OPPONENT SHIP PLACEMENT   */
+  /*          OPPONENT SHIP PLACEMENT         */
 
   auditComputerPlacement(){
     let orientIndex = { 
@@ -301,7 +301,8 @@ class DOM{ /* Class links DOM to GameBoards */
     }
       this.randomShipSet() 
   }
-  /*    GAME FUNCTIONS     */ 
+  /*          GAME FUNCTIONS          */
+
   attackHandling(target, player){ /* fed from event listeners in index -> gameBegins() */
    
     let attackStatus = player.receiveAttack(target)
@@ -352,7 +353,8 @@ class DOM{ /* Class links DOM to GameBoards */
       }
     })
   }
-  // COMPUTER SEARCH DELEGATION
+/*          COMPUTER SEARCH DELEGATION          */
+
   sweepSearch(){
     let coord = this.search.pattern.coord //proposed attack coords
   
@@ -409,7 +411,7 @@ class DOM{ /* Class links DOM to GameBoards */
       let direction = this.search.hitSearch[0]
 
       coord = board[coord][direction].toString() /* coords stored in obj */      
-      if(board[coord].selected === false /* && this.auditHitSearchGap(coord, direction, ship) !== false */){ /* NOT YET ATTACKED */
+      if(board[coord].selected === false){ /* NOT YET ATTACKED */
         let marker = this.attackHandling(coord, this.player1)
         this.appendMarker(coord, marker)
   
@@ -426,10 +428,7 @@ class DOM{ /* Class links DOM to GameBoards */
 
         this.handleCompSearch()
       }
-      
-     //CALLS BELOW FOR MISS, AND ALREADY ATTACKED
 
-      
     }
     catch(error){ /* OUT OF RANGE */
       if(error instanceof TypeError){
@@ -440,36 +439,7 @@ class DOM{ /* Class links DOM to GameBoards */
       }
     }
   }
-/*   auditHitSearchGap(coord, direction, ship){
-    if(ship.hits === 1 && this.search.gap > 2){
-      let inverse = {up: 'down', down: 'up', left: 'right', right: 'left'}
-
-      let cell = this.player1.board[coord]
-
-      let orient1 = this.countHitGap(direction, cell)
-
-      let orient2 = this.countHitGap(inverse[direction], cell)
-      if(orient1 + orient2 < this.search.gap){ //Don't attack
-   
-        return false
-      }
-      return true //Attack
-    } 
-  }
-  countHitGap(direction, cell){
-    let count = 0
-    while(true){
-      let coord = cell[direction]
-      if(cell.selected === true && cell.coordinates !== this.search.lastHit || coord === null){
-        
-        break
-      }
-      cell = this.attackedPlayer.board[coord.toString()]
-      count++
-    }
-    return count
-  } */
-  // STATE MONITORING AND ALTERATION
+  /*          COMP SEARCH STATE MONITORING AND ALTERATION          */
 
   handleCompSearch(){ /* recursion here.. not in the search functions */
     if(this.player1.sunk.length === 5){

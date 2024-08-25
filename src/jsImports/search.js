@@ -3,7 +3,7 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = 'one'//this.randomizeOrigin()
+    this.origin = this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
@@ -88,7 +88,6 @@ class Search{
     let y = parseInt((this.pattern.coord.split(','))[1])
 
     if(this.origin === 'one' && (x === 10 || y > 9)){
-      console.log('add to halfway')
       this.pattern.addToStart = this.pattern.addToHalfway
     }
     if(this.origin === 'two' && x === -1){
@@ -110,7 +109,6 @@ class Search{
 
     }
     return y < 0 || y > 9 || x < 0 || x > 9 ? false : true /* false: new start, true: keep going down */
-
   }
   changeGap(increment){
     return this.gap = increment
