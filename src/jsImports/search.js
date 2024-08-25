@@ -3,16 +3,17 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = this.randomizeOrigin()
+    this.origin = 'one' //this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
     this.lastHit = ''
 
+    this.targetShip = undefined //updates sweep search finds hit
     this.hitLog = [] /* "firstHit" coordinates are pushed here if determined that more than one ship is attacked */
     this.hitCount = 0
     this.missCount = 0
-    this.multiShips = false // if ships are aligned during search toggles to true
+    // this.multiShips = false // if ships are aligned during search toggles to true
     // used to control when this.hitLog pushes data
 
     this.hitSearch = ['up', 'down', 'left', 'right']
@@ -126,8 +127,12 @@ class Search{
     return this.hitLog.splice(0,1)
   }
   prepShipInfo(){
-    this.lastHit = this.hitLog[0]
+    this.firstHit = this.hitLog[0].coordinates
+    this.lastHit = this.firstHit
+    this.targetShip = this.hitLog[0].occupied
     this.hitSearch = ['up', 'down', 'left', 'right']
+    console.log(this.targetShip, this.lastHit)
+    console.log(this.hitSearch)
     /* 
     Ways to determine:
       1. gather hit and miss count since hunting ship became true.
@@ -151,6 +156,43 @@ class Search{
     }
  
   }
+  compareAttacks(cell){
+    if(this.targetShip.name === cell.occupied.name){
+      return true
+    }
+    else{
+      this.pushHitLog(cell)
+      return false
+    }
+  }
+  pushHitLog(cell){
+    this.hitLog.push(cell)
+    return this.hitLog
+  }
+  monitorTarget(){
+    if(this.targetShip === undefined){ return }
+
+    if(this.targetShip.sunk === true){
+      this.updateSunk()
+
+      if(this.hitLog.length === 0){
+        this.huntingShip = false
+        this.hitLog = []
+        this.targetShip = undefined
+      }
+      else{
+        this.prepShipInfo() // refreshes search array & last hit
+        this.trimHitLog()
+        
+      }
+    }
+    console.log(this.sunk)
+  }
+  updateSunk(){
+    this.sunk.push(this.targetShip)
+    return this.sunk
+  }
 }
+
 
 module.exports = Search
