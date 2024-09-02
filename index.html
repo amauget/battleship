@@ -4,40 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BattleShip</title>
+  <link rel="icon" href="./battleshipTabIcon.png"></link>
 </head>
 <body>
-  <div class="header">
+ <!--  <div class="header">
+    <img src="./battleshipTabIcon.png" alt="battleship image" class="battleshipImg">
     <h1>Battleship</h1>
+  </div> -->
+  <a href="./searchCapabilities.html">Click to View AI search Capabilities</a>
+  <div class="opponentBoardContainer">
+    <h4>Enemy Coordinates</h4>
+    <div class="letterCoordinates">
+      <div class="coord" id="letter">J</div>
+      <div class="coord" id="letter">I</div>
+      <div class="coord" id="letter">H</div>
+      <div class="coord" id="letter">G</div>
+      <div class="coord" id="letter">F</div>
+      <div class="coord" id="letter">E</div>
+      <div class="coord" id="letter">D</div>
+      <div class="coord" id="letter">C</div>
+      <div class="coord" id="letter">B</div>
+      <div class="coord" id="letter">A</div>
+    </div>
+    <div class="numberCoordinates">
+      <div class="coord" id="number"></div><!-- deliberately empty for aesthetic -->
+      <div class="coord" id="number">0</div>
+      <div class="coord" id="number">1</div>
+      <div class="coord" id="number">2</div>
+      <div class="coord" id="number">3</div>
+      <div class="coord" id="number">4</div>
+      <div class="coord" id="number">5</div>
+      <div class="coord" id="number">6</div>
+      <div class="coord" id="number">7</div>
+      <div class="coord" id="number">8</div>
+      <div class="coord" id="number">9</div>
+    </div>
   </div>
-
-  <div class="opponentBoard">
-    <h1>opponent board here</h1>
+<div class="playerBoardContainer">
+  <h4>Ally Coordinates</h4>
+  <div class="letterCoordinates">
+    <div class="coord" id="letter">J</div>
+    <div class="coord" id="letter">I</div>
+    <div class="coord" id="letter">H</div>
+    <div class="coord" id="letter">G</div>
+    <div class="coord" id="letter">F</div>
+    <div class="coord" id="letter">E</div>
+    <div class="coord" id="letter">D</div>
+    <div class="coord" id="letter">C</div>
+    <div class="coord" id="letter">B</div>
+    <div class="coord" id="letter">A</div>
   </div>
-
-  <div class="playerBoard">
-
+  <div class="numberCoordinates">
+    <div class="coord" id="number"></div><!-- deliberately empty for aesthetic -->
+    <div class="coord" id="number">0</div>
+    <div class="coord" id="number">1</div>
+    <div class="coord" id="number">2</div>
+    <div class="coord" id="number">3</div>
+    <div class="coord" id="number">4</div>
+    <div class="coord" id="number">5</div>
+    <div class="coord" id="number">6</div>
+    <div class="coord" id="number">7</div>
+    <div class="coord" id="number">8</div>
+    <div class="coord" id="number">9</div>
   </div>
-  <div class="alert">
-
-  </div>
-  <button class="startGame">Start Game</button>
-
-  <button class="resetPieces">Reset Pieces</button>
   
-  <div class="sideBar">
+</div>
+    <div class="sideBar">
     <div class="toggle">
       <button class="orient" id="x">Horizontal</button>
       <button class="orient" id="y">Vertical</button>
     </div>
     
     <ul class="ships">
-      <li class="ship" id="carrier">Carrier</li>
-      <li class="ship" id="battleship">BattleShip</li>
-      <li class="ship" id="sub">Submarine</li>
-      <li class="ship" id="cruiser">Cruiser</li>
-      <li class="ship" id="destroyer">Destroyer</li>
-    </ul>
+      <img class="ship" id="carrier" src="./externalItems/shipSprites/carrier.png" alt="">
+      <img class="ship" id="battleship" src="./externalItems/shipSprites/battleship.png"></img>
+      <img class="ship" id="submarine" src="./externalItems/shipSprites/submarine.png"></img>
+      <img class="ship" id="cruiser" src="./externalItems/shipSprites/cruiser.png"></img>
+      <img class="ship" id="destroyer" src="./externalItems/shipSprites/destroyer.png"></img>
+    </div>
+  </ul>
+  <div class="alert">
   </div>
+  <div class="hitLog">
+    <h2 class="title">Correspondence Log</h2>
+    <div class="listContainer">
+    </div>
+  </div> 
+
+  <button class="startGame">Start Game</button>
+  <button class="resetPieces">Reset Pieces</button>
 
 </body>
 <script src="bundle.js"></script>
