@@ -3,7 +3,7 @@ class Search{
     this.sunk = sunk /* DOM.js this.player1.sunk array for search tracking */
 
     this.gap = 2 // defaults to length of destroyer
-    this.origin = 'one' //this.randomizeOrigin()
+    this.origin = this.randomizeOrigin()
     this.pattern = this.searchInfo()
 
     this.firstHit = ''
@@ -98,7 +98,6 @@ class Search{
       this.pattern.addToStart = this.pattern.addToHalfway
       this.pattern.start = '0,-1'
       this.pattern.coord = '0,-1'
-      console.log(this.pattern)
     }
     if(this.origin === 'four' && y < 0 && x === 2){
       this.pattern.addToStart = this.pattern.addToHalfway
@@ -131,8 +130,6 @@ class Search{
     this.lastHit = this.firstHit
     this.targetShip = this.hitLog[0].occupied
     this.hitSearch = ['up', 'down', 'left', 'right']
-    console.log(this.targetShip, this.lastHit)
-    console.log(this.hitSearch)
     /* 
     Ways to determine:
       1. gather hit and miss count since hunting ship became true.
@@ -186,7 +183,6 @@ class Search{
         
       }
     }
-    console.log(this.sunk)
   }
   updateSunk(){
     this.sunk.push(this.targetShip)

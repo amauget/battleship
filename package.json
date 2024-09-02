@@ -1,0 +1,26 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack",
+    "watch": "jest --watch *.js",
+    "shipTest": "jest --watch ship.test.js",
+    "boardTest": "jest --watch gameBoard.test.js",
+    "playerTest": "jest --watch player.test.js",
+    "randomize": "jest --watch randomizeAudit.test.js",
+    "live": "webpack --watch"
+  },
+  "author": "Aaron Mauget",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "jest": "^29.7.0",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

@@ -4,8 +4,8 @@ const Ship = ShipObjs.Ship
 class GameBoard{
   constructor(playerType){ /* ship obj requires length and name determined. */
     this.board = this.createGraph()
-    this.playerType = playerType
-    this.sinkCount = 0 /* This could be used to track winner/loser. But does it belong here, or under player class? */
+    this.playerType = playerType /* either "playerCell" or "opponentCell" for gameBoard coordinates */
+
     this.carrier = new Ship(5, 'carrier')
     this.battleship = new Ship(4, 'battleship')
     this.cruiser = new Ship(3, 'cruiser')
@@ -13,7 +13,8 @@ class GameBoard{
     this.destroyer = new Ship(2, 'destroyer')
 
     this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer] /* utilized for setting opponent ships */
-
+    this.sunk = [] /* sunk ship tracker. Allows access to names(DOM Alert) and length of ship (computer search) */
+    
   }
   createGraph(){
     this.board = {}
@@ -38,6 +39,32 @@ class GameBoard{
     }
     return this.board
   }
+  
+  resetShipsArray(){
+    return this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer]
+  }
+
+  setShip(ship, validArray, orientation = 'x'){
+    let next = undefined
+    if(orientation === 'x'){
+      next = 'right'
+    }
+    else{ /* orientation = y */
+      next = 'up'
+    }
+    let arraySeg = validArray[0]
+
+    let key = this.board[arraySeg].coordinates
+    for(let i = 0; i < ship.length; i++){
+      this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
+      key = this.board[key][next]
+
+      arraySeg = validArray[i]
+      key = this.board[arraySeg][next]
+    }
+    return this.board
+  }
+
   surroundingCoords(col, row){
     let up = [col, row + 1]
     let down = [col, row -1 ]
@@ -60,63 +87,39 @@ class GameBoard{
     return array
   }
 
- 
- validPlacement(ship, item, orientation){ 
-  /* set duplicates should be handled in setShip()*/
-  let key = item
-  if(typeof(item) === 'object'){ /* DOM Item vs String Coordinates */
-    key = item.value
-  }
-  let currentCoord = this.board[key]
-
-  let array = []
-  let next = 'right'
-  if(orientation === 'y'){
-    next = 'up'
-  }
-  for(let i = 0; i < ship.length; i++){
-    array.push(`${currentCoord.coordinates}`) /* push first because selected coor is valid by nature */
-    if(currentCoord[next] === null){
-      if(array.length < ship.length){
-        array.push(currentCoord[next])
-      }
-      break
-    }
-    else{
-      currentCoord = this.board[currentCoord[next]]
-    }
-  }
-  return array
- }
-  setShip(ship, validArray, orientation = 'x'){
-    let next = undefined
-    if(orientation === 'x'){
-      next = 'right'
-    }
-    else{ /* orientation = y */
-      next = 'up'
-    }
-    let arraySeg = validArray[0]
-
-    let key = this.board[arraySeg].coordinates
-    for(let i = 0; i < ship.length; i++){
-      this.board[key].occupied = ship /* allows ship to be referenced later when square has an interaction */
-      key = this.board[key][next]
-
-      arraySeg = validArray[i]
-      key = this.board[arraySeg][next]
-    }
-    return this.board
-  }
   trimShipsArray(ship){
     let index = this.shipsArray.indexOf(ship)
     
     return this.shipsArray.splice(index, 1)
   }
-  
-  resetShipsArray(){
-    return this.shipsArray = [this.carrier, this.battleship, this.cruiser, this.submarine, this.destroyer]
-  }
+ 
+  validPlacement(ship, item, orientation){ /* item -> start coordinate var */
+  /* set duplicates should be handled in setShip()*/
+    let key = item
+    if(typeof(item) === 'object'){ /* DOM Item vs String Coordinates */
+      key = item.value
+    }
+    let currentCoord = this.board[key]
+
+    let array = []
+    let next = 'right'
+    if(orientation === 'y'){
+      next = 'up'
+    }
+    for(let i = 0; i < ship.length; i++){
+      array.push(`${currentCoord.coordinates}`) /* push first because selected coor is valid by nature */
+      if(currentCoord[next] === null){
+        if(array.length < ship.length){
+          array.push(currentCoord[next])
+        }
+        break
+      }
+      else{
+        currentCoord = this.board[currentCoord[next]]
+      }
+    }
+    return array
+ }
 
   // START GAME
 
@@ -125,12 +128,10 @@ class GameBoard{
       this.changeSelected(this.board[key])
 
       if(this.board[key].occupied !== false){ /* ship class item is stored in "this.board[coor].occupied" making .hit() callable when square is attacked. */
-        // console.log('hit')
         let shipKey = this.board[key].occupied
         shipKey.hit()
         return 'hit'
       }
-      // console.log('miss')
       return 'miss'
     }
     else{
@@ -140,6 +141,7 @@ class GameBoard{
   changeSelected(item){ /* changes coordinate selected status to true to avoid multiple attacks on a coord */
     return item.selected = true
   }
+
 }
 
 

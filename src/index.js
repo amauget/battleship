@@ -6,22 +6,39 @@ import './style.css'
 Emphasis on loosely coupled function relationships
 */
 
-function init(){ 
+function init(start = 'firstGame'){ 
+  let body = document.querySelector('body')
+
   let game = new DOM()
 
-  let opponentBoard = document.querySelector('.opponentBoardContainer')
-  game.createBoard(opponentBoard, 'opponentBoard', 'opponentCell')
+
+  game.originalInnerHTML(body)
+  
+  let opponentBoardContainer = document.querySelector('.opponentBoardContainer')
+  game.createBoard(opponentBoardContainer, 'opponentBoard', 'opponentCell')
 
   let playerBoardContainer = document.querySelector('.playerBoardContainer')
   game.createBoard(playerBoardContainer, 'playerBoard', 'playerCell')
 
-  // game.alert.welcome()
+  if(start === 'firstGame'){
+    game.alert.welcome()
 
-  // let okayBtn = document.querySelector('.okay')
-  // okayBtn.addEventListener('click', () =>{
-  //   game.alert.hide()
-    setUp(game, playerBoardContainer, opponentBoard)
-//   })
+    let handleOkay = () => {
+      game.alert.hide()
+
+      setUp(game, playerBoardContainer, opponentBoardContainer)
+      okayBtn.removeEventListener('click', handleOkay)
+    }
+  
+    let okayBtn = document.querySelector('.okay')
+    okayBtn.addEventListener('click', handleOkay)
+
+    
+  }
+  else{
+    setUp(game, playerBoardContainer, opponentBoardContainer)
+  }
+
 }
 function setUp(game, playerBoard, opponentBoard){ /* all current data is stored outside the queue */
   let shipList = document.querySelector('.ships')
@@ -56,11 +73,10 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
         target = target.parentElement
       }
       if(target.className === 'cell'){
-        // console.log(target.value)
         switch(target.className){
           case('cell'):
-        //   console.log('case', target.value)
-            game.updateValidArray(target) /*if ship img is clicked within cell, parent cell value targeted */
+
+          game.updateValidArray(target) /*if ship img is clicked within cell, parent cell value targeted */
         }
         
       }
@@ -70,7 +86,6 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
       game.cellAuditColoration()
     }
   }
-  // let playerBoard = document.querySelector('.playerBoardContainer')
   playerBoard.addEventListener('mouseover', handleMouseover)
 
   let playerDOM = document.querySelector('.playerBoardContainer')
@@ -147,58 +162,117 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
       playerDOM.removeEventListener('mouseover', handleMouseover)
       
       resetPieces.removeEventListener('click', handleReset)
-     
+
+      game.alert.displayHitLog()
+      
       gameBegins(game, playerBoard, opponentBoard)
+      
+      startGame.style.display = 'none'
+      resetPieces.style.display = 'none'
+      
+      let sideBar = document.querySelector('.sideBar')
+      sideBar.style.marginRight = '-100vw'
+
+      // game.setShipColoration() 
+      //FOR DEV 
+      // game.resetDOM()
+      // init('reset')
     }
 
   })
-  // REMOVE THESE AFTER DEV
-  // game.changeCurrentPlayer()
-  // gameBegins(game)
 }
 
 
 function gameBegins(game, playerBoard, opponentBoard){ 
-  game.changeCurrentPlayer()
   opponentBoard = handleOpponentShips(game)
+  
+  game.alert.openFire()
+  game.alert.timeout(1500)
 
-  game.handleCompSearch()
-
-  // let eventToggle = ((target) =>{
-  //   let element1 = opponentBoard, element2 = playerBoard
-
-  //   if(target === 'playerCell'){ element1 = playerBoard, element2 = opponentBoard }
-    
-  //   element1.removeEventListener('click', handleClick)
-  //   element2.addEventListener('click', handleClick)
-  // })
+  game.currentPlayer = game.player1
+  game.attackedPlayer = game.player2
 
   let handleClick = (event) =>{
     let target = event.target
 
-    if(target.id === game.currentPlayer.playerType){ 
-      /* playerType =  playerCell or opponentCell to isolate cell ID*/
-      switch(target.className){
-        case('cell'):
-          // Reminder: cell.value = key for coordinate obj
-          let marker = game.attackHandling(target.value)
-          target.appendChild(marker)
+    let cell = game.player2.board[target.value]
+
+    try{
+      if(game.currentPlayer === game.player1 && cell.selected === false){
+
+        if(target.id === 'opponentCell'){ 
+          switch(target.className){
+            case('cell'):
+              // Reminder: cell.value = key for coordinate obj
+              
+              let marker = game.attackHandling(target.value, game.player2)
+              target.appendChild(marker)
+              if(game.winnerFound() !== false){ /* after player attack */
+                opponentBoard.removeEventListener('click', handleClick)
+                handleEndGame(game)
+                return
           
-          game.toggleTurn() //changes turn
+              } 
+
+              game.toggleTurn()
+  
+              setTimeout(() =>{
+                game.handleCompSearch()
+                if(game.winnerFound() !== false){ /* after computer attack */
+                  opponentBoard.removeEventListener('click', handleClick)
+                  handleEndGame(game)
+                  return
+                }  
+              }, 250)
+              
+              
+              game.toggleTurn()
+
+            }
+        }
+      }
+      
+    }catch(error){
+      console.log(error)
+      if(error === TypeError){ /* handles target ids that don't have coordinate values. */
+        return
       }
     }
+    
   }
-   
   opponentBoard.addEventListener('click', handleClick)
-  playerBoard.addEventListener('click', handleClick)
 }
+function handleEndGame(game){
+  game.alert.result(game.winner)
+  game.changeBackground()
+  game.setShipColoration()
+  game.alert.timeout(3000)
+  game.alert.playAgain()
+
+  let playAgain = document.querySelector('.playAgain')
+
+  playAgain.addEventListener('click', ()=>{
+    game.resetDOM()
+    init('new game')
+  })
+
+
+
+}
+
+
 function handleOpponentShips(game){
+  game.toggleTurn()
+  //Change turn. Set ships. Change turn again..
   let opponentBoard = document.querySelector('.opponentBoardContainer')
-  game.defaultShipSelector()/* REMOVE AFTER DEV */
+  game.defaultShipSelector()
 
   game.randomShipSet()
 
   game.currentPlayer = game.player1
+
+  game.toggleTurn()
+
   return opponentBoard
 }
 

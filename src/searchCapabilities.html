@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Capabilites</title>
+  <link rel="icon" href="./battleshipTabIcon.png"></link>
+  <link rel="stylesheet" href="computerSearch.css">
+</head>
+<body>
+  <button class="back">Back to Battleship</button>
+  <h1>Computer Search Capabilites</h1>
+  <p class="synopsis">Thank you for viewing my game! I decided early on that undertaking the challenge of designing a ruthless opponent would be far more satisfying than the standard randomized search. Below you can find some of the AI search capabilities. </p>
+  <div class="sweep">
+    <div class="sweepTextContainer">
+    <h2 class="subTitle">General Sweep Patterns</h2>
+    <p class="sweepText">The general sweep has 4 randomized origins to remove the advantage of knowing where the computer search may start.</p>
+  </div>
+    <div class="orginContainer" id="origin1">
+      <div class="title">Origin 1</div>
+      <video width="760" height="480" autoplay loop muted>
+        <source src="./videos/origin1.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="orginContainer" id="origin2">
+      <div class="title">Origin 2</div>
+      <video width="760" height="480" autoplay loop muted>
+        <source src="./videos/origin2.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="orginContainer" id="origin3">
+      <div class="title">Origin 3</div>
+      <video width="760" height="480" autoplay loop muted>
+        <source src="./videos/origin3.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="orginContainer" id="origin4">
+      <div class="title">Origin 4</div>
+      <video width="760" height="480" autoplay loop muted>
+        <source src="./videos/origin4.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+  <div class="otherSearchContainer">
+    <h2 class="subTitle">Hit Search Capabilities</h2>
+    <div class="adaptiveContainer">
+    <h2 class="adaptiveTitle">Adaptive Search</h2>
+    <p class="adaptiveText">
+      The AI uses process of elimination to determine the optimal gapping during the sweep search phase. The default gap is configured to search every other cell, but as shown below, the gap can grow to four if the conditions permit. <strong>So hide your destroyer at all costs!</strong>
+    </p>
+    <video width="760" height="480" autoplay loop muted>
+      <source src="./videos/adaptiveSearch.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="clusterContainer">
+      <h2 class="clusterTitle">Cluster Detection</h2>
+      <p class="clusterText">When a cluster is detected, a queue is modeled, allowing for the search of the current ship before moving to the next.</p>
+      <video width="760" height="480" autoplay loop muted>
+        <source src="./videos/clusters.mp4" type="video/mp4">
+      </video>
+  </div>
+</div>
+<div class="footer">
+  <p class="footerTxt"> Aaron Mauget - The Odin Project 2024</p>
+</div>
+</body>
+
+</html>

@@ -7,6 +7,8 @@ class DOM{ /* Class links DOM to GameBoards */
     this.player1 = new GameBoard('playerCell')
     this.player2 = new GameBoard('opponentCell')
 
+    this.body = []
+
     this.alert = new Alert()
 
     this.currentPlayer = this.player1 /* toggle to tell who is attacking and being attacked. */
@@ -23,11 +25,17 @@ class DOM{ /* Class links DOM to GameBoards */
  
     this.search = new Search(this.player1.sunk) /* feeds player1 sunk array to computer search */
     
-    this.difficulty = 'extreme'
+    this.winner = false
   }
 
   /*          PRE-GAME FUNCTIONS          */
-  
+  originalInnerHTML(body){
+    /* save OG elements for "new game" */
+    for(let i = 0; i < body.childElementCount; i++){
+      this.body.push(body.children[i].cloneNode(true)) 
+      /* clone node disables updating of elements as game goes on. */
+    }
+  }
   allShipsPlaced(){ /* REMEMBER TO CHANGE CURRENT PLAYER */
     let shipList = this.currentPlayer.shipsArray
     return shipList.length === 0 ? true : false
@@ -123,16 +131,16 @@ class DOM{ /* Class links DOM to GameBoards */
 
     return this.sideBarList
   }
-  setShipColoration(){
+  setShipColoration(array = this.validArray){
     let opponent = document.querySelector('.opponentBoard')
     let cells = opponent.querySelectorAll('.cell')
 
     cells.forEach(cell =>{
       /* target only relevent cells, if empty and within range, allow ship placement */
-      if((this.validArray).includes(cell.value)){
-        (this.currentPlayer).board[cell.value].background = 'blue'
-        this.currentPlayer.board[cell.value]
-        cell.style.background = 'blue'
+      if((array).includes(cell.value)){
+       
+        // this.player2.board[cell.value]
+        cell.style.background = (this.player2).board[cell.value].background 
       }
     })
     return this.currentPlayer
@@ -304,7 +312,6 @@ class DOM{ /* Class links DOM to GameBoards */
   /*          GAME FUNCTIONS          */
 
   attackHandling(target, player){ /* fed from event listeners in index -> gameBegins() */
-   
     let attackStatus = player.receiveAttack(target)
     let marker = document.createElement('p')
     marker.className = 'marker'
@@ -312,26 +319,52 @@ class DOM{ /* Class links DOM to GameBoards */
 
     if(attackStatus === 'miss'){
       marker.style.color = 'white'
-
-
     }
     else if(attackStatus === 'hit'){
       if(this.search.huntingShip === true){
         this.search.hitCount ++ 
       }
       marker.style.color = 'red'
-      if(this.search.multiShips === false){
-        // this.search.hitLog.push(target)
+      this.search.auditHitLogLength() 
+      
 
+      if(player.playerType === 'opponentCell'){ /* player 1 is attacking */
+     
+        let ship = (player.board[target].occupied)
+        let shipName = ship.name
+
+        if(ship.sunk === false){
+          this.alert.appendHitLog(shipName,'Hit', 'black')
+        }
+        else{
+          this.alert.appendHitLog(shipName,'Sunk', 'red')
+        }
       }
-      else{
-        this.search.auditHitLogLength() 
-        // toggles this.search.multiShips to false if ship cluster is sunk
+
+    }    
+    return marker
+  }
+  winnerFound(){
+    let playerSunk = 0
+    let compSunk = 0
+    let nameArray = ['carrier', 'battleship', 'cruiser', 'submarine', 'destroyer']
+    for(let i = 0; i < 5; i++){
+      let shipName = nameArray[i]
+
+      if(this.player1[shipName].sunk === true){
+        playerSunk++
+      }
+      if(this.player2[shipName].sunk === true){
+        compSunk ++
       }
     }
-    //!!!!!!!!!!!!!! MULTI SHIPS !!!!!!!!!!!!!!!!!!!!!
-    
-    return marker
+    if(playerSunk === 5){
+      this.winner = 'computer'
+    }
+    else if(compSunk === 5){
+      this.winner = 'player'
+    }
+    return this.winner
   }
 
   // Attack Functions
@@ -395,7 +428,7 @@ class DOM{ /* Class links DOM to GameBoards */
   }
   hitSearch(coord){ //coord obj
     let board = this.player1.board
-    // this.auditSunk()
+    // this.auditSunk(coord, this.player1)
 
     // this.search.multipleShips() 
     try{
@@ -444,7 +477,7 @@ class DOM{ /* Class links DOM to GameBoards */
   /*          COMP SEARCH STATE MONITORING AND ALTERATION          */
 
   handleCompSearch(){ /* recursion here.. not in the search functions */
-    console.log(this.search.gap)
+    console.log('handleCompSearch')
     this.search.monitorTarget() //Coordinates targetShip & hitLog
     if(this.player1.sunk.length === 5){
       return
@@ -456,12 +489,12 @@ class DOM{ /* Class links DOM to GameBoards */
     else{
         this.hitSearch(this.search.lastHit) //change to this.hitLog[0]?
     }
+    
   }
 
   auditSearchGap(){
     let ships = this.search.sunk
     ships = ships.sort((shortest, longest) => shortest.length - longest.length)
-    console.log(ships)
     let gap = 2
 
     if(ships.length !== 0){
@@ -496,7 +529,29 @@ class DOM{ /* Class links DOM to GameBoards */
     return (this.search.hitSearch).splice(0,1)
   }
 
-  
+  /* RESET GAME FUNCTIONS */
+
+  resetDOM(){
+    let body = document.querySelector('body')
+    body.innerHTML = ''
+    for(let i = 0; i < this.body.length; i++){
+      body.append(this.body[i])
+    }
+  }
+
+  changeBackground(){
+    let board = this.player2.board
+    let array = []
+    for(const cell in board){
+      if(board[cell].occupied !== false){
+        board[cell].background = 'gray'
+        array.push(board[cell].coordinates.toString())
+      }
+    }
+    this.setShipColoration(array)
+    return board
+
+  }
 }
 
 module.exports = DOM
