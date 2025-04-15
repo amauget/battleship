@@ -90,9 +90,12 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
 
   let playerDOM = document.querySelector('.playerBoardContainer')
 
+
   playerDOM.addEventListener('mousedown', (event) =>{ /* this event allows for ship direction toggle with scroll click */
-    if(game.allShipsPlaced() === false){ 
+    if(game.allShipsPlaced() === false){
+      event.preventDefault()
       if(event.button === 1){
+        
         let newVal = undefined
         if(game.orient === 'x')
           newVal = 'y'
