@@ -108,11 +108,9 @@ class DOM{ /* Class links DOM to GameBoards */
   defaultShipSelector(){ /* utilizes ship array found under Gameboard */
     let shipsArray = this.currentPlayer.shipsArray
     if(shipsArray.length > 0){
-      let shipName = shipsArray[0].name
-      
-      this.selectShip(shipName)
+      this.selectShip(shipsArray[0].name)
 
-      this.selectedShipIndicator(document.querySelector(`#${shipName}`))
+      this.selectedShipIndicator(document.querySelector(`#${shipsArray[0].name}`))
     }
     
   }

@@ -175,13 +175,7 @@ function setUp(game, playerBoard, opponentBoard){ /* all current data is stored 
       
       let sideBar = document.querySelector('.sideBar')
       sideBar.style.marginRight = '-100vw'
-
-      // game.setShipColoration() 
-      //FOR DEV 
-      // game.resetDOM()
-      // init('reset')
     }
-
   })
 }
 
