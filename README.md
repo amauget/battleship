@@ -2,8 +2,8 @@
 
 Live: https://amauget.github.io/battleship/
 
-First and foremost, this codebase messier than a college dorm room.
-At the time of writing this, battleship has been complete (more or less) for 8 months, and I've finally begun to develope a codebase architecture system.
+First and foremost, this codebase is messier than a college dorm room.
+At the time of writing this, battleship has been complete (more or less) for 8 months, and there is a drastic difference in my codebase architecture now.
 
 That said, I'm tremendously proud of this project, as the search functionality was quite an intensive design that required much whiteboard time.
 If you click the link at the top of the hosted page, you'll see a demo of all the programmed search capabilities. 
